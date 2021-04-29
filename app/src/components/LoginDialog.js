@@ -153,7 +153,18 @@ const ChooseRoom = ({
 							required
 							fullWidth
 						/>
-
+						<TextField
+							id='roomId'
+							label={intl.formatMessage({
+								id             : 'label.roomNameLogin',
+								defaultMessage : 'Room ID (optional)'
+							})}
+							variant='outlined'
+							margin='normal'
+							name='roomName'
+							type='text'
+							fullWidth
+						/>
 					</DialogContent>
 
 					<DialogActions>
@@ -165,6 +176,23 @@ const ChooseRoom = ({
 							<FormattedMessage
 								id='label.login'
 								defaultMessage='Login'
+							/>
+						</Button>
+					</DialogActions>
+					<DialogActions>
+						<Button
+							variant='contained'
+							color='secondary'
+							type='button'
+							onClick={(e) =>
+							{
+								e.preventDefault();
+								window.location.href='/guestroom';
+							}}
+						>
+							<FormattedMessage
+								id='label.loginAsGuest'
+								defaultMessage='Login as guest'
 							/>
 						</Button>
 					</DialogActions>

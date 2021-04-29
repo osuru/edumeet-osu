@@ -5,6 +5,7 @@ import { withRoomContext } from '../RoomContext';
 import classnames from 'classnames';
 import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
+import * as roomActions from '../actions/roomActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
@@ -35,6 +36,18 @@ import randomString from 'random-string';
 import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import Switch from '@material-ui/core/Switch';
+import Collapse from '@material-ui/core/Collapse';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import EditableInput from './Controls/EditableInput';
+import Logger from '../Logger';
+
+const logger = new Logger('JoinDialog');
 
 const styles = (theme) =>
 	({
@@ -49,6 +62,10 @@ const styles = (theme) =>
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
 			backgroundRepeat     : 'no-repeat'
+		},
+		margin :
+		{
+			height : theme.spacing(3)
 		},
 		dialogTitle :
 		{
@@ -122,6 +139,24 @@ const styles = (theme) =>
 					backgroundColor : '#f50057'
 				} }
 
+		},
+		switchLabel : {
+			justifyContent : 'space-between',
+			flex           : 'auto',
+			display        : 'flex',
+			padding        : theme.spacing(0)
+		},
+		nested : {
+			display       : 'block',
+			paddingTop    : 0,
+			paddingBottom : 0,
+			paddingLeft   : '25px',
+			paddingRight  : '25px'
+		},
+		settings : {
+			width           : '100%',
+			backgroundColor : theme.palette.background.paper,
+			border          : '1px solid black'
 		}
 
 	});
@@ -162,7 +197,13 @@ const JoinDialog = ({
 	setMediaPerms,
 	classes,
 	setAudioMuted,
-	setVideoMuted
+	setVideoMuted,
+	setLockRoom,
+	setMuteOnJoin,
+	signInRequired,
+	joinByAccessCode,
+	accessCode,
+	setEnableRecording
 }) =>
 {
 
@@ -171,6 +212,9 @@ const JoinDialog = ({
 	const history = useHistory();
 
 	const intl = useIntl();
+
+	const [ SettingsOpen, setSettingsOpen ] = useState(false);
+	const [ _accessCode, setAccessCode ] = useState('123');
 
 	displayName = displayName.trimLeft();
 
@@ -230,20 +274,20 @@ const JoinDialog = ({
 
 		const encodedRoomId = encodeURIComponent(roomId);
 
+		logger.debug('AAAAAAAAAAAAAA: %o', roomClient);
 		roomClient.join({
-			roomId    : encodedRoomId,
-			joinVideo : mediaPerms.video,
-			joinAudio : mediaPerms.audio
+			roomId     : encodedRoomId,
+			joinVideo  : mediaPerms.video,
+			joinAudio  : mediaPerms.audio,
+			accessCode : accessCode
 		});
 	};
 
 	const handleFocus = (event) => event.target.select();
 
-	/*
 	const handleAuth = () =>
 	{
 		_askForPerms();
-
 		const encodedRoomId = encodeURIComponent(roomId);
 
 		!loggedIn ?
@@ -253,9 +297,7 @@ const JoinDialog = ({
 				joinVideo : mediaPerms.video,
 				joinAudio : mediaPerms.audio
 			});
-
 	};
-	*/
 
 	const handleJoinUsingEnterKey = (event) =>
 	{
@@ -310,7 +352,7 @@ const JoinDialog = ({
 							}
 						</Grid>
 						<Grid item>
-							{ window.config.loginEnabled &&
+							{ window.config.loginEnabled && false &&
 							<>
 								<Button
 									onClick={
@@ -387,46 +429,6 @@ const JoinDialog = ({
 					/>
 					{/* /ROOM NAME */}
 
-					{/* AUTH TOGGLE BUTTONS */}
-					{false &&
-					<Grid container
-						direction='row'
-						justify='space-between'
-						alignItems='center'
-					>
-						<Grid item>
-							<ToggleButtonGroup
-								value={authType}
-								onChange={handleSetAuthType}
-								aria-label='choose auth'
-								exclusive
-							>
-								<ToggleButton value='guest'>
-									<WorkOutlineIcon/>&nbsp;
-
-									<FormattedMessage
-										id='room.joinRoomm'
-										defaultMessage='Guest'
-									/>
-								</ToggleButton>
-
-								<ToggleButton value='auth'>
-									<VpnKeyIcon/>&nbsp;
-
-									<FormattedMessage
-										id='room.joinRoomm'
-										defaultMessage='Auth'
-									/>
-								</ToggleButton>
-
-							</ToggleButtonGroup >
-
-						</Grid>
-
-					</Grid>
-					}
-					{/* /AUTH TOGGLE BUTTONS */}
-
 					{/* NAME FIELD */}
 					<TextField
 						id='displayname'
@@ -488,6 +490,7 @@ const JoinDialog = ({
 							direction='row'
 							justify='space-between'
 							alignItems='flex-end'
+							spacing={1}
 						>
 
 							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
@@ -559,61 +562,204 @@ const JoinDialog = ({
 							</Grid>
 							}
 							{/* /MEDIA PERMISSION BUTTONS */}
-
-							{/* JOIN/AUTH BUTTON */}
-							<Grid item>
-								<Button
-									onClick={handleJoin}
-									variant='contained'
-									color='primary'
-									id='joinButton'
-								>
-									<FormattedMessage
-										id='label.join'
-										defaultMessage='Join'
-									/>
-								</Button>
-
-							</Grid>
+							{/* AUTH TOGGLE BUTTONS */}
 							{/*
-							{authType === 'auth' && !loggedIn &&
-							<Grid item>
-								<Button
-									onClick={handleAuth}
-									variant='contained'
-									color='secondary'
-									id='joinButton'
-								>
-									<FormattedMessage
-										id='room.login'
-										defaultMessage='Next'
-									/>
-								</Button>
+							{!loggedIn &&
+								<Grid item>
+									<ToggleButtonGroup
+										value={authType}
+										onChange={handleSetAuthType}
+										aria-label='choose auth'
+										exclusive
+									>
+										<ToggleButton value='guest'>
+											<WorkOutlineIcon/>&nbsp;
 
-							</Grid>
+											<FormattedMessage
+												id='room.joinGuest'
+												defaultMessage='Guest'
+											/>
+										</ToggleButton>
+
+										<ToggleButton value='auth'>
+											<VpnKeyIcon/>&nbsp;
+
+											<FormattedMessage
+												id='room.joinAuth'
+												defaultMessage='Auth'
+											/>
+										</ToggleButton>
+
+									</ToggleButtonGroup >
+
+								</Grid>
+
+							} */}
+							{/* /AUTH TOGGLE BUTTONS */}
+							{/* JOIN/AUTH BUTTON */}
+							{ authType !=='auth' &&
+								<Grid item >
+									<Button
+										onClick={handleJoin}
+										variant='contained'
+										color='primary'
+										id='joinButton'
+									>
+										<FormattedMessage
+											id='label.joinGuest'
+											defaultMessage='Join as guest'
+										/>
+									</Button>
+
+								</Grid>
 							}
-							{authType === 'auth' && loggedIn &&
-							<Grid item>
-								<Button
-									onClick={handleJoin}
-									variant='contained'
-									className={classes.joinButton}
-									id='joinButton'
-								>
-									<FormattedMessage
-										id='room.login'
-										defaultMessage='Join'
-									/>
-								</Button>
+							{
+								<Grid item>
+									<Button
+										onClick={handleAuth}
+										variant='contained'
+										className={classes.red}
+										id='joinButton'
+									>
+										<FormattedMessage
+											id='room.joinAuth'
+											defaultMessage='Join'
+										/>
+									</Button>
 
-							</Grid>
+								</Grid>
 							}
-							*/}
-
 							{/* /JOIN BUTTON */}
 
-						</Grid>
+							{/* /SETTINGS */}
+							<Grid item xs={12}>
+								<List className={classes.settings} component='nav'>
+									<ListItem button onClick={() => setSettingsOpen(!SettingsOpen)}>
+										<ListItemText primary={intl.formatMessage({
+											id             : 'settings.showAdvanced',
+											defaultMessage : 'Advanced settings'
+										})}
+										/>
+										{SettingsOpen ? <ExpandLess /> : <ExpandMore />}
+									</ListItem>
+									<Collapse in={SettingsOpen} timeout='auto' unmountOnExit>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting, classes.switchLabel)}
+													control={
+														<Switch color='secondary'
+															checked={setLockRoom}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'tooltip.lockRoom',
+														defaultMessage : 'Enable wait room'
+													})}
+												/>
+											</ListItem>
+										</List>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting, classes.switchLabel)}
+													control={
+														<Switch color='secondary'
+															checked={setMuteOnJoin}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'room.muteAll',
+														defaultMessage : 'Mute all on'
+													})}
+												/>
+											</ListItem>
+										</List>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting, classes.switchLabel)}
+													control={
+														<Switch color='secondary'
+															checked={signInRequired}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'tooltip.permitGuest',
+														defaultMessage : 'Permit guests'
+													})}
+												/>
+											</ListItem>
+										</List>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting, classes.switchLabel)}
+													control={
+														<Switch color='secondary'
+															checked={joinByAccessCode}
+															onChange={(event) =>
+															{
+																roomActions.setJoinByAccessCode(event.target.value);
+															}}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'label.roomCodeEnable',
+														defaultMessage : 'Enable passcode to access'
+													})}
+												/>
+											</ListItem>
+										</List>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting)}
+													variant='outlined'
+													margin='normal'
+													control={
+														<TextField color='secondary'
+															id='passcode'
+															value={_accessCode}
+															onChange={(event) =>
+															{
+																// room.accessCode=event.target.value;
 
+																roomClient.setAccessCode(event.target.value);
+
+																/* setAccessCode(event.target.value); */
+																logger.debug('ACCESSAAA: %o', room);
+															}}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'label.roomCode',
+														defaultMessage : 'Set passcode'
+													})}
+												/>
+											</ListItem>
+										</List>
+										<List component='div'>
+											<ListItem className={classes.nested}>
+												<FormControlLabel
+													className={classnames(classes.setting, classes.switchLabel)}
+													control={
+														<Switch color='secondary'
+															checked={setEnableRecording}
+														/>}
+													labelPlacement='start'
+													label={intl.formatMessage({
+														id             : 'label.permitRecording',
+														defaultMessage : 'Permit recordin'
+													})}
+												/>
+											</ListItem>
+										</List>
+									</Collapse>
+								</List>
+
+							</Grid>
+						</Grid>
 					</DialogActions>
 					:
 					<DialogContent>
@@ -689,12 +835,20 @@ JoinDialog.propTypes =
 	setMediaPerms  	      : PropTypes.func.isRequired,
 	classes               : PropTypes.object.isRequired,
 	mediaPerms            : PropTypes.object.isRequired,
-	setAudioMuted         : PropTypes.bool.isRequired,
-	setVideoMuted         : PropTypes.bool.isRequired
+	setAudioMuted         : PropTypes.bool,
+	setVideoMuted         : PropTypes.bool,
+	setLockRoom           : PropTypes.bool,
+	setMuteOnJoin         : PropTypes.bool,
+	signInRequired        : PropTypes.bool,
+	joinByAccessCode      : PropTypes.bool,
+	accessCode            : PropTypes.string,
+	setEnableRecording    : PropTypes.bool
 };
 
 const mapStateToProps = (state) =>
 {
+	logger.debug('State AAA: %o', state);
+
 	return {
 		room                  : state.room,
 		mediaPerms            : state.settings.mediaPerms,
@@ -702,7 +856,13 @@ const mapStateToProps = (state) =>
 		displayNameInProgress : state.me.displayNameInProgress,
 		loginEnabled          : state.me.loginEnabled,
 		loggedIn              : state.me.loggedIn,
-		myPicture             : state.me.picture
+		myPicture             : state.me.picture,
+		setLockRoom	          : state.settings.setLockRoom,
+		setMuteOnJoin         : state.settings.setMuteOnJoin,
+		signInRequired        : state.settings.signInRequired,
+		joinByAccessCode      : state.room.joinByAccessCode,
+		accessCode            : state.room.accessCode,
+		setEnableRecording    : state.settings.setEnableRecording
 	};
 };
 
@@ -725,8 +885,15 @@ const mapDispatchToProps = (dispatch) =>
 		setVideoMuted : (flag) =>
 		{
 			dispatch(settingsActions.setVideoMuted(flag));
+		},
+		setAccessCode : (accessCode) =>
+		{
+			dispatch(roomActions.setAccessCode(accessCode));
+		},
+		setJoinByAccessCode : (accessCode) =>
+		{
+			dispatch(roomActions.setJoinByAccessCode(accessCode));
 		}
-
 	};
 };
 
@@ -746,7 +913,8 @@ export default withRoomContext(connect(
 				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&
-				prev.me.picture === next.me.picture
+				prev.me.picture === next.me.picture &&
+				prev.room.accessCode === next.room.accessCode
 			);
 		}
 	}

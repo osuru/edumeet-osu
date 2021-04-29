@@ -55,14 +55,15 @@
 	},
 	"scripts": {
 		"analyze": "source-map-explorer build/static/js/*",
-		"start": "HTTPS=true PORT=4443 react-scripts start",
+		"start": " react-scripts start",
 		"build:dev": "NODE_ENV=develompent REACT_APP_DEBUG=* react-scripts build ",
 		"build": "react-scripts build ",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"electron": "electron --no-sandbox .",
 		"dev": "nf start -p 3000",
-		"lint": "eslint -c .eslintrc.json --ext .js src"
+		"lint": "npx eslint -c .eslintrc.json --ext .js src",
+		"lint:fix": "npx eslint src/**/*.js --fix"
 	},
 	"browserslist": [
 		">0.2%",
@@ -72,8 +73,12 @@
 	],
 	"devDependencies": {
 		"electron": "^7.1.1",
-		"eslint-plugin-react": "^7.19.0",
+		"eslint": "^7.25.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^3.4.0",
+		"eslint-plugin-react": "^7.23.2",
 		"foreman": "^3.0.1",
+		"prettier": "^2.2.1",
 		"redux-mock-store": "^1.5.3"
 	}
 }

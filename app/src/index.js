@@ -186,7 +186,7 @@ function run()
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Switch>
-												<Route exact path='/' component={JoinDialog} />
+												<Route exact path='/' component={LoginDialog} />
 												<Route exact path='/login_dialog' component={LoginDialog} />
 												<Route path='/:id' component={App} />
 											</Switch>
