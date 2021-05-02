@@ -2249,6 +2249,7 @@ export default class RoomClient
 			store.dispatch(peerActions.clearPeers());
 			store.dispatch(consumerActions.clearConsumers());
 			store.dispatch(roomActions.clearSpotlights());
+			store.dispatch(roomActions.setAccessCode(this._accessCode));
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 

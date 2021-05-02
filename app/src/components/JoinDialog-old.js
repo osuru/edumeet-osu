@@ -214,8 +214,7 @@ const JoinDialog = ({
 	const intl = useIntl();
 
 	const [ SettingsOpen, setSettingsOpen ] = useState(false);
-
-	let [ _accessCode, setAccessCode ] = useState(roomClient.accessCode);
+	const [ _accessCode, setAccessCode ] = useState('123');
 
 	displayName = displayName.trimLeft();
 
@@ -624,7 +623,7 @@ const JoinDialog = ({
 									>
 										<FormattedMessage
 											id='room.joinAuth'
-											defaultMessage='Join as user'
+											defaultMessage='Join'
 										/>
 									</Button>
 
@@ -721,15 +720,15 @@ const JoinDialog = ({
 													control={
 														<TextField color='secondary'
 															id='passcode'
+															value={_accessCode}
 															onChange={(event) =>
 															{
-																room.accessCode=event.target.value;
-																_accessCode=event.target.value;
-																setAccessCode=event.target.value;
-																// accessCode=event.target.value;
-																roomClient._AccessCode = event.target.value;
+																// room.accessCode=event.target.value;
 
-																// setAccessCode(event.target.value);
+																roomClient.setAccessCode(event.target.value);
+
+																/* setAccessCode(event.target.value); */
+																logger.debug('ACCESSAAA: %o', room);
 															}}
 														/>}
 													labelPlacement='start'
@@ -869,7 +868,6 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = (dispatch) =>
 {
-
 	return {
 		changeDisplayName : (displayName) =>
 		{
