@@ -39,6 +39,11 @@ const interactiveServer = require('./lib/interactiveServer');
 const promExporter = require('./lib/promExporter');
 const { v4: uuidv4 } = require('uuid');
 
+
+
+
+
+
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.worker.logLevel:', config.mediasoup.worker.logLevel);
@@ -65,7 +70,7 @@ const rooms = new Map();
 const peers = new Map();
 
 // TLS server configuration.
-try {
+//const tls = {};
 const tls =
 {
 	cert          : fs.readFileSync(config.tls.cert),
@@ -84,10 +89,11 @@ const tls =
 		].join(':'),
 	honorCipherOrder : true
 };
- } catch (err) {
-    const tls = {} // fallback for empty object
+/* } catch (err) {
+    throw "TLS CERTIFICATE NOT FOUND! " + err;
+    //const tls = {} // fallback for empty object
 
-}
+}*/
 const app = express();
 
 app.use(helmet.hsts());
@@ -662,6 +668,19 @@ function isPathAlreadyTaken(actualUrl)
 	return false;
 }
 
+
+// Returns process command to use (GStreamer/FFmpeg) default is FFmpeg
+const getProcess = (recordInfo) => {
+  switch (PROCESS_NAME) {
+    case 'GStreamer':
+      return new GStreamer(recordInfo);
+    case 'FFmpeg':
+    default:
+      return new FFmpeg(recordInfo);
+  }
+};
+
+
 /**
  * Create a WebSocketServer to allow WebSocket connections from browsers.
  */
@@ -748,8 +767,10 @@ async function runWebSocketServer()
 					await config.userMapping({ peer, room, roomId, userinfo: _userinfo });
 				}
 			}
-
+			//room.on('startRecord',this.startRecord(peer));
+			
 			room.handlePeer({ peer, returning });
+			
 
 			statusLog();
 		})
@@ -768,6 +789,10 @@ async function runWebSocketServer()
 /**
  * Launch as many mediasoup Workers as given in the configuration file.
  */
+
+
+
+
 async function runMediasoupWorkers()
 {
 	const { numWorkers } = config.mediasoup;

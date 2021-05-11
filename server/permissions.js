@@ -22,5 +22,7 @@ module.exports = {
 	// The role(s) have permission to moderate files
 	MODERATE_FILES   : 'MODERATE_FILES',
 	// The role(s) have permission to moderate room (e.g. kick user)
-	MODERATE_ROOM    : 'MODERATE_ROOM'
+	MODERATE_ROOM    : 'MODERATE_ROOM',
+	// Start recording
+	START_RECORD	 : 'START_RECORD'
 };

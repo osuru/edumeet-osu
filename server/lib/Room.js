@@ -7,6 +7,18 @@ const { SocketTimeoutError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
+const FFmpeg = require('./ffmpeg');
+const GStreamer = require('./gstreamer');
+/*const {
+  initializeWorkers,
+  createRouter,
+  createTransport
+} = require('./mediasoup');*/
+
+const {
+  getPort,
+  releasePort
+} = require('./port'); 
 
 const {
 	BYPASS_ROOM_LOCK,
@@ -25,7 +37,8 @@ const permissions = require('../permissions'), {
 	EXTRA_VIDEO,
 	SHARE_FILE,
 	MODERATE_FILES,
-	MODERATE_ROOM
+	MODERATE_ROOM,
+	START_RECORD
 } = permissions;
 
 const config = require('../config/config');
@@ -54,6 +67,7 @@ const roomPermissions =
 	[SHARE_FILE]       : [ userRoles.NORMAL ],
 	[MODERATE_FILES]   : [ userRoles.MODERATOR ],
 	[MODERATE_ROOM]    : [ userRoles.MODERATOR ],
+	[START_RECORD]     : [ userRoles.MODERATOR ],
 	...config.permissionsFromRoles
 };
 
@@ -262,6 +276,9 @@ class Room extends EventEmitter
 
 		// Locked flag.
 		this._locked = false;
+		
+		// Record flag.
+		this._recorded = false;
 
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
@@ -293,6 +310,8 @@ class Room extends EventEmitter
 
 		this._handleLobby();
 		this._handleAudioLevelObserver();
+		this.PROCESS_NAME = process.env.PROCESS_NAME || 'FFmpeg';
+		this.SERVER_PORT = process.env.SERVER_PORT || 3000;
 	}
 
 	isLocked()
@@ -587,6 +606,147 @@ class Room extends EventEmitter
 		return Object.keys(this._peers).length === 0;
 	}
 
+	/*
+	 *  Recording capabilities
+	*/
+	getProcess (recordInfo)  
+	{
+	  switch (this.PROCESS_NAME) {
+		case 'GStreamer':
+		  return new GStreamer(recordInfo);
+		case 'FFmpeg':
+		default:
+		  return new FFmpeg(recordInfo);
+	  }
+	};
+	async publishProducerRtpStream(peer, producer, ffmpegRtpCapabilities) 
+	{
+	  logger.info('startRecord: publishProducerRtpStream()');
+		/*if (!producer.id) {
+			logger.info('startRecord: producer without id. Skipped..');
+			return false;
+		}*/
+	  // Create the mediasoup RTP Transport used to send media to the GStreamer process
+	  const rtpTransportConfig = config.mediasoup.plainRtpTransport;
+
+	  // If the process is set to GStreamer set rtcpMux to false
+	  //if (this.PROCESS_NAME === 'GStreamer') {
+		rtpTransportConfig.rtcpMux = false;
+	  //}
+	  const router = this._mediasoupRouters.get(peer.routerId);
+	  //const rtpTransport = await createTransport('plain', router, rtpTransportConfig);
+	  const rtpTransport = await router.createPlainTransport(rtpTransportConfig);
+	  // Set the receiver RTP ports
+	  const remoteRtpPort = await getPort();
+	  peer.remotePorts.push(remoteRtpPort);
+
+	  let remoteRtcpPort;
+	  // If rtpTransport rtcpMux is false also set the receiver RTCP ports
+	  if (!rtpTransportConfig.rtcpMux) {
+		remoteRtcpPort = await getPort();
+		peer.remotePorts.push(remoteRtcpPort);
+	  }
+
+
+	  // Connect the mediasoup RTP transport to the ports used by GStreamer
+	  await rtpTransport.connect({
+		ip: config.mediasoup.recording.ip,
+		port: remoteRtpPort,
+		rtcpPort: remoteRtcpPort
+	  });
+	logger.info("startRecord: mediasoup  RTP SEND transport connected: %s:%d <--> %s:%d (%s)",
+      rtpTransport.tuple.localIp,
+      rtpTransport.tuple.localPort,
+      rtpTransport.tuple.remoteIp,
+      rtpTransport.tuple.remotePort,
+      rtpTransport.tuple.protocol
+    );
+	logger.info(
+      "mediasoup  RTCP SEND transport connected: %s:%d <--> %s:%d (%s)",
+      rtpTransport.rtcpTuple.localIp,
+      rtpTransport.rtcpTuple.localPort,
+      rtpTransport.rtcpTuple.remoteIp,
+      rtpTransport.rtcpTuple.remotePort,
+      rtpTransport.rtcpTuple.protocol
+    );
+	  peer.addTransport(rtpTransport.id,rtpTransport);
+
+	  const codecs = [];
+	  // Codec passed to the RTP Consumer must match the codec in the Mediasoup router rtpCapabilities
+	  const routerCodec = router.rtpCapabilities.codecs.find(
+		codec => codec.kind === producer.kind
+	  );
+	  codecs.push(routerCodec);
+
+	  const rtpCapabilities = {
+		codecs,
+		rtcpFeedback: []
+	  };
+
+	  // Start the consumer paused
+	  // Once the gstreamer process is ready to consume resume and send a keyframe
+	  logger.info("startRecord: producer: %o",producer.id);
+	  const rtpConsumer = await rtpTransport.consume({
+		producerId: producer.id,
+		rtpCapabilities: rtpCapabilities,
+		paused: true
+	  });
+	logger.info(
+      "mediasoup  RTP SEND consumer created, kind: %s, type: %s, paused: %s, SSRC: %s CNAME: %s",
+      rtpConsumer.kind,
+      rtpConsumer.type,
+      rtpConsumer.paused,
+      rtpConsumer.rtpParameters.encodings[0].ssrc,
+      rtpConsumer.rtpParameters.rtcp.cname
+    );
+	  peer.addConsumer(rtpConsumer.id,rtpConsumer);
+
+	  return {
+		remoteRtpPort,
+		remoteRtcpPort,
+		localRtcpPort: rtpTransport.rtcpTuple ? rtpTransport.rtcpTuple.localPort : undefined,
+		rtpCapabilities,
+		rtpParameters: rtpConsumer.rtpParameters
+	  };
+	};
+
+	async stopRecord(peer)
+	{
+		peer.process.kill();
+		
+	}
+
+	async startRecord(peer)
+	{
+	  let recordInfo = {};
+
+	 // for (const producer of peer.producers) {
+		 for (const producer of peer.producers.values()) {
+		  logger.info("startRecord: producer.kind %o ",producer.kind);
+		  recordInfo[producer.kind] = await this.publishProducerRtpStream(peer, producer);
+	  }
+
+	  recordInfo.fileName = peer.roomId+'.'+this._uuid+'.'+peer.id+'.'+Date.now().toString();
+	  logger.info("startRecord:  recordInfo %o ",recordInfo);
+	  // If no producers
+	  if (recordInfo['video']==undefined && recordInfo['audio']==undefined ) return false;
+	  
+	  if (peer.process && peer.process.state ) peer.process.kill();
+	  
+	  peer.process = this.getProcess(recordInfo);
+
+	  setTimeout(async () => {
+		for (const consumer of peer.consumers.values()) {
+		  // Sometimes the consumer gets resumed before the GStreamer process has fully started
+		  // so wait a couple of seconds
+		  if (consumer.paused) {
+			logger.info('startRecord: Resume consumer: %o',consumer.id);
+			await consumer.resume();
+		  }
+		}
+	  }, 1000);
+	};
+
 	_parkPeer(parkPeer)
 	{
 		this._lobby.parkPeer(parkPeer);
@@ -872,7 +1032,8 @@ class Room extends EventEmitter
 					lastNHistory         : this._lastN,
 					locked               : this._locked,
 					lobbyPeers           : lobbyPeers,
-					accessCode           : this._accessCode
+					accessCode           : this._accessCode,
+					recorded			 : this._recorded
 				});
 
 				// Mark the new Peer as joined.
@@ -1096,7 +1257,9 @@ class Room extends EventEmitter
 					this._audioLevelObserver.addProducer({ producerId: producer.id })
 						.catch(() => {});
 				}
-
+				if (this._recorded) {
+					await this.startRecord(peer);
+				}
 				break;
 			}
 
@@ -1592,7 +1755,42 @@ class Room extends EventEmitter
 
 				break;
 			}
+			
+			case 'moderator:stop_record':
+			{
+				if (!this._hasPermission(peer, START_RECORD))
+					throw new Error('peer not authorized');
+				if (this._recorded){
+					this._recorded=false;
+					for (const peerMember of this._allPeers.values()){
+						
+						this.stopRecord(peerMember);
+						
+						this._notification(peer.socket, 'moderator:stop_record', null, true);
+					}
+				}
+				cb();
 
+				break;
+			}
+
+			case 'moderator:start_record':
+			{
+				if (!this._hasPermission(peer, START_RECORD))
+					throw new Error('peer not authorized');
+				if (!this._recorded){
+					this._recorded=true;
+					for (const peerMember of this._allPeers.values()){
+						
+						this.startRecord(peerMember);
+						
+						this._notification(peer.socket, 'moderator:start_record', null, true);
+					}
+				}
+				cb();
+
+				break;
+			}
 			case 'moderator:mute':
 			{
 				if (!this._hasPermission(peer, MODERATE_ROOM))

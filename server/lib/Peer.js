@@ -2,6 +2,7 @@ const EventEmitter = require('events').EventEmitter;
 const userRoles = require('../userRoles');
 const Logger = require('./Logger');
 
+
 const logger = new Logger('Peer');
 
 class Peer extends EventEmitter
@@ -52,6 +53,10 @@ class Peer extends EventEmitter
 		this._producers = new Map();
 
 		this._consumers = new Map();
+		
+		this.remotePorts = [];
+		
+		this.process = undefined;
 
 		this._handlePeer();
 	}
