@@ -35,6 +35,8 @@ import PeopleIcon from '@material-ui/icons/People';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import ChatIcon from '@material-ui/icons/Chat';
+import RadioButtonCheckedOutlinedIcon from '@material-ui/icons/RadioButtonCheckedOutlined';
+import RemoveCircleOutlinedIcon from '@material-ui/icons/RemoveCircleOutlined';
 import VideoCallIcon from '@material-ui/icons/VideoCall';
 import SelfViewOnIcon from '@material-ui/icons/Videocam';
 import SelfViewOffIcon from '@material-ui/icons/VideocamOff';
@@ -236,6 +238,7 @@ const TopBar = (props) =>
 		unread,
 		canProduceExtraVideo,
 		canLock,
+		canRecord,
 		canPromote,
 		classes,
 		locale,
@@ -254,6 +257,17 @@ const TopBar = (props) =>
 		intl.formatMessage({
 			id             : 'tooltip.lockRoom',
 			defaultMessage : 'Lock room'
+		});
+
+	const startRecordTooltip = !room.recorded ?
+		intl.formatMessage({
+			id             : 'tooltip.startRecording',
+			defaultMessage : 'Start recording'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.stopRecording',
+			defaultMessage : 'Stop recording'
 		});
 
 	const fullscreenTooltip = fullscreen ?
@@ -442,6 +456,36 @@ const TopBar = (props) =>
 										<LockIcon />
 										:
 										<LockOpenIcon />
+									}
+								</IconButton>
+							</span>
+						</Tooltip>
+						<Tooltip title={startRecordTooltip}>
+							<span className={classes.disabledButton}>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.startRecord',
+										defaultMessage : 'Start recording'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canRecord}
+									onClick={() =>
+									{
+										if (!room.recorded)
+										{
+											roomClient.startRecording();
+										}
+										else
+										{
+											roomClient.stopRecording();
+										}
+									}}
+								>
+									{ !room.recorded ?
+										<RadioButtonCheckedOutlinedIcon />
+										:
+										<RemoveCircleOutlinedIcon />
 									}
 								</IconButton>
 							</span>
@@ -773,6 +817,44 @@ const TopBar = (props) =>
 					}
 				</MenuItem>
 				<MenuItem
+					aria-label={startRecordTooltip}
+					disabled={!canRecord}
+					onClick={() =>
+					{
+						handleMenuClose();
+
+						if (!room.recorded)
+						{
+							roomClient.startRecording();
+						}
+						else
+						{
+							roomClient.stopRecording();
+						}
+					}}
+				>
+					{ !room.recorded ?
+						<RadioButtonCheckedOutlinedIcon />
+						:
+						<RemoveCircleOutlinedIcon />
+					}
+					{ !room.recorded ?
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.startRecoring'
+								defaultMessage='Start recording'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.stopRecording'
+								defaultMessage='Stop recording'
+							/>
+						</p>
+					}
+				</MenuItem>
+				<MenuItem
 					aria-label={intl.formatMessage({
 						id             : 'tooltip.settings',
 						defaultMessage : 'Show settings'
@@ -973,6 +1055,7 @@ TopBar.propTypes =
 	unread               : PropTypes.number.isRequired,
 	canProduceExtraVideo : PropTypes.bool.isRequired,
 	canLock              : PropTypes.bool.isRequired,
+	canRecord            : PropTypes.bool.isRequired,
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
@@ -988,6 +1071,9 @@ const makeMapStateToProps = () =>
 
 	const hasLockPermission =
 		makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
+
+	const hasRecordPermission =
+		makePermissionSelector(permissions.START_RECORD);
 
 	const hasPromotionPermission =
 		makePermissionSelector(permissions.PROMOTE_PEER);
@@ -1008,6 +1094,7 @@ const makeMapStateToProps = () =>
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
+			canRecord            : hasRecordPermission(state),
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
 			localesList          : state.intl.list

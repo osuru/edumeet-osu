@@ -176,6 +176,7 @@ export default class RoomClient
 
 		this._muted = muted;
 
+		this.recorded = false;
 		// This device
 		this._device = device;
 
@@ -1838,6 +1839,42 @@ export default class RoomClient
 			roomActions.setMuteAllInProgress(false));
 	}
 
+	async startRecording()
+	{
+		logger.debug('startRecording()');
+
+		store.dispatch(
+			roomActions.setStartRecording());
+
+		try
+		{
+			await this.sendRequest('moderator:start_record');
+		}
+		catch (error)
+		{
+			logger.error('start_record() [error:"%o"]', error);
+		}
+
+	}
+
+	async stopRecording()
+	{
+		logger.debug('stopRecording()');
+
+		store.dispatch(
+			roomActions.setStopRecording());
+
+		try
+		{
+			await this.sendRequest('moderator:stop_record');
+		}
+		catch (error)
+		{
+			logger.error('stop_record() [error:"%o"]', error);
+		}
+
+	}
+
 	async stopAllPeerVideo()
 	{
 		logger.debug('stopAllPeerVideo()');
@@ -2970,6 +3007,35 @@ export default class RoomClient
 						break;
 					}
 
+					case 'moderator:start_record':
+					{
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.startRecording',
+									defaultMessage : 'Moderator start recording'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:stop_record':
+					{
+						if (this.recorded==true)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'moderator.stopRecording',
+										defaultMessage : 'Moderator stop recording'
+									})
+								}));
+						}
+
+						break;
+					}
+
 					case 'moderator:stopVideo':
 					{
 						this.disableWebcam();
@@ -3262,7 +3328,8 @@ export default class RoomClient
 				lastNHistory,
 				locked,
 				lobbyPeers,
-				accessCode
+				accessCode,
+				recorded
 			} = await this.sendRequest(
 				'join',
 				{
@@ -3329,6 +3396,10 @@ export default class RoomClient
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :
 				store.dispatch(roomActions.setRoomUnLocked());
+
+			recorded ?
+				store.dispatch(roomActions.setStartRecording()) :
+				store.dispatch(roomActions.setStopRecording());
 
 			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
 			{

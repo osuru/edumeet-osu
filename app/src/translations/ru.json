@@ -103,6 +103,8 @@
 	"tooltip.muteParticipantAudioModerator": "Везде отключить звук участника",
 	"tooltip.muteParticipantVideoModerator": "Везде отключить видео участника",
 	"tooltip.muteScreenSharingModerator": "Везде отключить совместные использования экрана участника",
+	"tooltip.startRecording": "Старт записи",
+	"tooltip.stopRecording": "Стоп записи",
 
 	"label.roomName": "ID видеоконференции",
 	"label.roomCode": "Пароль доступа",
@@ -235,6 +237,8 @@
 	"moderator.modifyPeerRoles": "Назначить права",
 	"moderator.muteVideo": "Модератор отключил ваше видео",
 	"moderator.stopScreenSharing": "Модератор остановил демонстрацию вашего экрана",
+	"moderator.startRecording": "Модератор начал запись",
+	"moderator.stopRecording": "Модератор остановил запись",
 
 	"unsupportedBrowser.titleUsnsupportedBrowser": "Обнаружен неподдерживаемый браузер!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Требуемые функции недоступны в вашем браузере!",

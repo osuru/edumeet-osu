@@ -38,7 +38,8 @@ const initialState =
 	clearFileSharingInProgress    : false,
 	roomPermissions               : null,
 	userRoles                     : null,
-	allowWhenRoleMissing          : null
+	allowWhenRoleMissing          : null,
+	recorded                      : false
 };
 
 const room = (state = initialState, action) =>
@@ -255,6 +256,12 @@ const room = (state = initialState, action) =>
 
 		case 'MUTE_ALL_IN_PROGRESS':
 			return { ...state, muteAllInProgress: action.payload.flag };
+
+		case 'START_RECORDING':
+			return { ...state, recorded: true };
+
+		case 'STOP_RECORDING':
+			return { ...state, recorded: false };
 
 		case 'STOP_ALL_VIDEO_IN_PROGRESS':
 			return { ...state, stopAllVideoInProgress: action.payload.flag };

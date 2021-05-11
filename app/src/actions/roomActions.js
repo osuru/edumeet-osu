@@ -181,6 +181,18 @@ export const setMuteAllInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setStartRecording = () =>
+	({
+		type : 'START_RECORDING'
+		// payload : { flag }
+	});
+
+export const setStopRecording = () =>
+	({
+		type : 'STOP_RECORDING'
+		// payload : { flag }
+	});
+
 export const setStopAllVideoInProgress = (flag) =>
 	({
 		type    : 'STOP_ALL_VIDEO_IN_PROGRESS',
