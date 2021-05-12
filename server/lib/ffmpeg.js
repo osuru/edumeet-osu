@@ -1,6 +1,6 @@
 // Class to handle child process used for running FFmpeg
 const Logger = require('./Logger');
-
+const config = require('../config/config');
 
 const logger = new Logger('ffmpeg');
 
@@ -12,11 +12,13 @@ const { createSdpText } = require('./sdp');
 const { convertStringToStream } = require('./utils');
 const fs = require('fs');
 
-const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || '/tmp';
+const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || config.mediasoup.recording.path;
 
 module.exports = class FFmpeg {
   constructor (rtpParameters) {
     this._rtpParameters = rtpParameters;
+	this.fileName=rtpParameters.fileName;
+	this.producers = rtpParameters;
     this._process = undefined;
     this._observer = new EventEmitter();
 	this._state=true;
@@ -87,7 +89,7 @@ module.exports = class FFmpeg {
   get _commandArgs () {
     let commandArgs = [
       '-loglevel',
-      'debug',
+      (config.mediasoup.recording.ffmpeg_debug || 'debug'),
       '-protocol_whitelist',
       'pipe,udp,rtp',
       '-fflags',

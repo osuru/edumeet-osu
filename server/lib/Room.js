@@ -1,4 +1,4 @@
-const EventEmitter = require('events').EventEmitter;
+' EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
@@ -310,7 +310,7 @@ class Room extends EventEmitter
 
 		this._handleLobby();
 		this._handleAudioLevelObserver();
-		this.PROCESS_NAME = process.env.PROCESS_NAME || 'FFmpeg';
+		this.PROCESS_NAME = process.env.PROCESS_NAME  || config.mediasoup.recording.process_name || 'FFmpeg';
 		this.SERVER_PORT = process.env.SERVER_PORT || 3000;
 	}
 
@@ -503,7 +503,7 @@ class Room extends EventEmitter
 			logger.info('peerClosed() [closedPeer:"%s"]', closedPeer.id);
 
 			const { id } = closedPeer;
-
+			
 			for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 			{
 				this._notification(peer.socket, 'lobby:peerClosed', { peerId: id });
@@ -619,6 +619,8 @@ class Room extends EventEmitter
 		  return new FFmpeg(recordInfo);
 	  }
 	};
+	
+	
 	async publishProducerRtpStream(peer, producer, ffmpegRtpCapabilities) 
 	{
 	  logger.info('startRecord: publishProducerRtpStream()');
@@ -630,47 +632,25 @@ class Room extends EventEmitter
 	  const rtpTransportConfig = config.mediasoup.plainRtpTransport;
 
 	  // If the process is set to GStreamer set rtcpMux to false
-	  //if (this.PROCESS_NAME === 'GStreamer') {
+	  if (this.PROCESS_NAME === 'GStreamer') {
 		rtpTransportConfig.rtcpMux = false;
-	  //}
-	  const router = this._mediasoupRouters.get(peer.routerId);
-	  //const rtpTransport = await createTransport('plain', router, rtpTransportConfig);
-	  const rtpTransport = await router.createPlainTransport(rtpTransportConfig);
-	  // Set the receiver RTP ports
-	  const remoteRtpPort = await getPort();
-	  peer.remotePorts.push(remoteRtpPort);
-
-	  let remoteRtcpPort;
-	  // If rtpTransport rtcpMux is false also set the receiver RTCP ports
-	  if (!rtpTransportConfig.rtcpMux) {
-		remoteRtcpPort = await getPort();
-		peer.remotePorts.push(remoteRtcpPort);
 	  }
-
-
-	  // Connect the mediasoup RTP transport to the ports used by GStreamer
-	  await rtpTransport.connect({
-		ip: config.mediasoup.recording.ip,
-		port: remoteRtpPort,
-		rtcpPort: remoteRtcpPort
-	  });
-	logger.info("startRecord: mediasoup  RTP SEND transport connected: %s:%d <--> %s:%d (%s)",
-      rtpTransport.tuple.localIp,
-      rtpTransport.tuple.localPort,
-      rtpTransport.tuple.remoteIp,
-      rtpTransport.tuple.remotePort,
-      rtpTransport.tuple.protocol
-    );
-	logger.info(
-      "mediasoup  RTCP SEND transport connected: %s:%d <--> %s:%d (%s)",
-      rtpTransport.rtcpTuple.localIp,
-      rtpTransport.rtcpTuple.localPort,
-      rtpTransport.rtcpTuple.remoteIp,
-      rtpTransport.rtcpTuple.remotePort,
-      rtpTransport.rtcpTuple.protocol
-    );
-	  peer.addTransport(rtpTransport.id,rtpTransport);
-
+	  
+	  const router = this._mediasoupRouters.get(peer.routerId);
+	  
+   	  var rtpTransport = undefined;
+	  /*	if (peer.plainTransports.has(producer.id)){
+				//use existing transport
+				
+				rtpTransport = peer.getTransport(peer.plainTransports.get(producer.id).transport);
+				logger.info('startRecord: use existing transport' );
+			}
+			else{
+				// create new transport*/
+				logger.info('startRecord: create transport');
+				 rtpTransport = await router.createPlainTransport(rtpTransportConfig);
+			/*}*/
+	 
 	  const codecs = [];
 	  // Codec passed to the RTP Consumer must match the codec in the Mediasoup router rtpCapabilities
 	  const routerCodec = router.rtpCapabilities.codecs.find(
@@ -682,15 +662,82 @@ class Room extends EventEmitter
 		codecs,
 		rtcpFeedback: []
 	  };
+		//transport already here
+	  if (peer.plainTransports.has(producer.id)){
+		
+		// stop all
+		for (let consumerId of peer.plainConsumers.keys()){
+			
+			const consumerArr = peer.plainConsumers.get(consumerId)
+			
+			if (producer.id === consumerArr.producer) {			
+				const consumer =  peer.getConsumer(consumerId);
+				consumer.close();
+				peer.plainConsumers.delete(consumerId);
+			}
+			// delete consumer;
+		}
+		
+		//remove transport
+		let transportId = peer.plainTransports.get(producer.id);
+		if (transportId){
+			
+			const transport=peer.getTransport(transportId.transport);
+			transport.close();
+			// delete transport;
+			peer.plainTransports.delete(producer.id);
+		}
+	  } //if exists
+		  // Set the receiver RTP ports
+		  const portcount=(!rtpTransportConfig.rtcpMux)? 2 : 1 ;
+		  const remoteRtpPort = await getPort(portcount);
+		  peer.remotePorts.set(remoteRtpPort,{transport:rtpTransport.id, producer:producer.id});
+		  
+		  let remoteRtcpPort;
+		  // If rtpTransport rtcpMux is false also set the receiver RTCP ports
+		  if (!rtpTransportConfig.rtcpMux) {
+			remoteRtcpPort = remoteRtpPort+1; // = await getPort();
+			peer.remotePorts.set(remoteRtcpPort,{transport:rtpTransport.id, producer:producer.id});
+		  }
 
+
+		  // Connect the mediasoup RTP transport to the ports used by GStreamer
+		  await rtpTransport.connect({
+			ip: config.mediasoup.recording.ip,
+			port: remoteRtpPort,
+			rtcpPort: remoteRtcpPort
+		  });
+		logger.info("startRecord: mediasoup  RTP SEND transport connected: %s:%d <--> %s:%d (%s)",
+		  rtpTransport.tuple.localIp,
+		  rtpTransport.tuple.localPort,
+		  rtpTransport.tuple.remoteIp,
+		  rtpTransport.tuple.remotePort,
+		  rtpTransport.tuple.protocol
+		);
+		
+		if (!rtpTransportConfig.rtcpMux){
+			logger.info(
+			"mediasoup  RTCP SEND transport connected: %s:%d <--> %s:%d (%s)",
+			rtpTransport.rtcpTuple.localIp,
+			rtpTransport.rtcpTuple.localPort,
+			rtpTransport.rtcpTuple.remoteIp,
+			rtpTransport.rtcpTuple.remotePort,
+			rtpTransport.rtcpTuple.protocol
+			);
+		}
+	  peer.addTransport(rtpTransport.id,rtpTransport);
+	  
+	  // producer.appData.transportId=transport.id;
+	
 	  // Start the consumer paused
-	  // Once the gstreamer process is ready to consume resume and send a keyframe
-	  logger.info("startRecord: producer: %o",producer.id);
+	  // Once the gstreamer/ffmpeg process is ready to consume resume and send a keyframe
+	  
 	  const rtpConsumer = await rtpTransport.consume({
 		producerId: producer.id,
 		rtpCapabilities: rtpCapabilities,
 		paused: true
 	  });
+	  
 	logger.info(
       "mediasoup  RTP SEND consumer created, kind: %s, type: %s, paused: %s, SSRC: %s CNAME: %s",
       rtpConsumer.kind,
@@ -699,8 +746,13 @@ class Room extends EventEmitter
       rtpConsumer.rtpParameters.encodings[0].ssrc,
       rtpConsumer.rtpParameters.rtcp.cname
     );
-	  peer.addConsumer(rtpConsumer.id,rtpConsumer);
 
+	  peer.addConsumer(rtpConsumer.id,rtpConsumer);
+	  peer.plainConsumers.set(rtpConsumer.id,{transport:rtpTransport.id, producer: producer.id });
+	  peer.plainTransports.set(producer.id,{ transport:rtpTransport.id, consumer: rtpConsumer.id ,
+								rtcPort:remoteRtpPort, rtcpPort:remoteRtcpPort });
+	  // producer.appData.rtpConsumerId = rtpConsumer.id;
+	  
 	  return {
 		remoteRtpPort,
 		remoteRtcpPort,
@@ -708,39 +760,256 @@ class Room extends EventEmitter
 		rtpCapabilities,
 		rtpParameters: rtpConsumer.rtpParameters
 	  };
+  	/*} else
+	{ //Existing transport
+		let rtpConsumerId = 0;
+		for (const [key, value] of peer.plainConsumers){
+			if (value.producer === producer.id) 
+					rtpConsumerId = key;
+		};
+		let rtpConsumer = peer.getConsumer(rtpConsumerId);
+		
+		return {
+		remoteRtpPort: rtpTransport.tuple.remotePort,
+		remoteRtcpPort: rtpTransport.rtcpTuple.remotePort,
+		localRtcpPort: rtpTransport.rtcpTuple ? rtpTransport.rtcpTuple.localPort : undefined,
+		rtpCapabilities,
+		rtpParameters: rtpConsumer.rtpParameters
+	  };
+		logger.info('startRecord: Use existing transport');
+	}
+*/
 	};
 
 	async stopRecord(peer)
 	{
-		peer.process.kill();
+		try{
+		// remove consumers
+		for (const [id, process] of peer.process.entries()){
+			logger.info('stopRecord: kill process %o',id);
+			if (process) process.kill();
+		}
+		peer.process.clear();
+		
+		for (var consumerId of peer.plainConsumers.keys()){
+			
+			const consumer =  peer.getConsumer(consumerId);
+			logger.info('stopRecord: remove consumer %o',consumerId);
+			if (consumer) consumer.close();
+			// delete consumer;
+		}
+		
+		peer.plainConsumers.clear();
+		
+		//remove transport
+		for (var transportArr of peer.plainTransports.values()){
+			
+			const transport=peer.getTransport(transportArr.transport);
+			logger.info('stopRecord: remove transport %o',transportArr.transport);
+			if (transport) transport.close();
+			// delete transport;
+		}
+		
+		peer.plainTransports.clear();
+		for (let port of peer.remotePorts.keys()){
+			releasePort(port);
+		}
+		peer.remotePorts.clear();
+		
+		}
+		catch(err){
+			logger.error('Error stop record: %o',err);
+		}
+		
+		
+		this._notification(peer.socket, 'stop_record', null, true, true);
 		
 	}
 
+	async stopRecordProducer(peer,producer,restart=true)
+	{
+		var transportId = null;
+		try{
+		// remove consumers
+		for (var consumerId of peer.plainConsumers.keys()){
+			
+			const consumerArr = peer.plainConsumers.get(consumerId)
+			
+			if (producer.id === consumerArr.producer) {			
+				const consumer =  peer.getConsumer(consumerId);
+				consumer.close();
+				peer.plainConsumers.delete(consumerId);
+			}
+			// delete consumer;
+		}
+		
+		//remove transport
+		 transportId = peer.plainTransports.get(producer.id);
+		if (transportId){
+			
+			const transport=peer.getTransport(transportId.transport);
+			transport.close();
+			// delete transport;
+			peer.plainTransports.delete(producer.id);
+		}
+			releasePort(transportId.rtpPort);
+			releasePort(transportId.rtcpPort);
+		}
+		catch(err){
+			logger.error('Error stop record: %o',err);
+		}
+		//TODO!!! - restart if there is other producers
+		let process_key1 = '-.'+producer.id;
+		let process_key2 = producer.id+'.-';
+		
+		
+		if (transportId && peer.process.has(transportId.process)){
+			let process=peer.process.get(transportId.process);
+			process.kill();
+			peer.process.delete(transportId.process);
+		}
+		if (restart)  this.startRecord(peer);
+		
+		/*//fallback
+		if (peer.process.has(process_key1)){
+			let process=peer.process.get(process_key1);
+			process.kill();
+			peer.process.delete(process_key1);
+		}
+		if (peer.process.has(process_key2)){
+			let process=peer.process.get(process_key2);
+			process.kill();
+			peer.process.delete(process_key2);
+		}*/
+		
+		this._notification(peer.socket, 'stop_record', null, true, true);
+		
+	}
+	
 	async startRecord(peer)
 	{
-	  let recordInfo = {};
-
+	  var recordInfo = {};
+	  let producerNewCount = 0;
+	  let producerPairCount = 0;
+	  let producerIds = {video:[],audio:[]};
+	  let producerPairs = [];
+	  let processes = [];
+	  // TODO - create many transports for several videos from peer
 	 // for (const producer of peer.producers) {
 		 for (const producer of peer.producers.values()) {
-		  logger.info("startRecord: producer.kind %o ",producer.kind);
-		  recordInfo[producer.kind] = await this.publishProducerRtpStream(peer, producer);
+		  //let recordInfoTmp = {};
+		  
+		  //if (!peer.plainTransports.has(producer.id)){
+			  let recordInfoTmp = await this.publishProducerRtpStream(peer, producer);
+			  logger.info("startRecord: new producer.kind %o ",producer.kind);
+			  producerNewCount=producerNewCount+1;
+			  producerIds[producer.kind].push({ producer: producer.id, kind: producer.kind, state: 'new', recordInfo: recordInfoTmp });
+		/*
+		 } else {
+			 let recordInfoTmp = await this.publishProducerRtpStream(peer, producer);
+			 producerIds[producer.kind].push({ producer: producer.id, kind: producer.kind, state: 'exist' , recordInfo: recordInfoTmp });
+			 logger.info("startRecord: existing producer.kind %o ",producer.kind);
+		 }*/
 	  }
-
-	  recordInfo.fileName = peer.roomId+'.'+this._uuid+'.'+peer.id+'.'+Date.now().toString();
-	  logger.info("startRecord:  recordInfo %o ",recordInfo);
-	  // If no producers
-	  if (recordInfo['video']==undefined && recordInfo['audio']==undefined ) return false;
+		// create pairs of producers
+		logger.info("startRecord:  producerIds %o ",producerIds);
+		
+		while (producerIds['video'].length >0 || 
+				producerIds['audio'].length >0){
+			let video=producerIds['video'].pop() || undefined;
+			let audio=producerIds['audio'].pop() || undefined;
+			logger.info("startRecord: create producer Pair %o %o ",video,audio);	
+			producerPairs.push({ video:video, audio: audio });
+		}
+	  logger.info("startRecord:  producerPairs %o ",producerPairs);
+	 
+	 // If no producers
+	 // ToDo - check if some freeze, old producers stack in recordind state while new producers ready
+	 
+	  if (producerNewCount == 0 ) {
+			logger.info('startRecord: no producers - skipped peer');
+			return false;
+	  }
 	  
-	  if (peer.process && peer.process.state ) peer.process.kill();
 	  
-	  peer.process = this.getProcess(recordInfo);
+	  
+	  while (producerPairs.length > 0){
+		  let pair = producerPairs.pop();
+		  if (pair['video'])
+				recordInfo['video']=pair['video'].recordInfo;
+		  if (pair['audio'])
+				recordInfo['audio']=pair['audio'].recordInfo;
+		  
+		  //let resumeRecord=((pair['video'])? pair['audio'].state!='new' : true || pair['video'].state!='new' ;
+		  //let continueRecord=pair['audio'].state=='exist' || pair['video'].state=='exist' ;
+		  let resumeRecord = false;
+		   
+		  // if already recording
+		  let process_key = ((pair['video'])? pair['video'].producer : '-') + '.' +
+							((pair['audio'])? pair['audio'].producer : '-');
+		  let process_key_audio = '-.' +
+							((pair['audio'])? pair['audio'].producer : '-');	
+		  let process_key_video = ((pair['video'])? pair['video'].producer : '-') + '.-';
+		  
+		  recordInfo.fileName = peer.roomId+'.'+this._uuid+'.'+peer.id+'.'+
+								process_key+'.'+Date.now().toString();
+		  let process = undefined;
+		  if (peer.process.has(process_key)){
+			  // no action needed - record continue
+			  //todo =- think about continue
+			  process=peer.process.get(process_key);
+			  peer.process.delete(process_key);
+			  logger.info('startRecord: continue full process %o',[ recordInfo, process_key, pair ]);
+		  }
+		  if (peer.process.has(process_key_audio)){
+			  // Was only audio - will full - record continue
+			  process=peer.process.get(process_key_audio)
+			  peer.process.delete(process_key_audio);
+			  logger.info('startRecord: continue audio only process %o',[ recordInfo, process_key, pair ]);
+		  }
+		  if (peer.process.has(process_key_video)){
+			  // Was only video - will full - record continue
+			  process=peer.process.get(process_key_video)
+			  peer.process.delete(process_key_video);
+			  logger.info('startRecord: continue video only process %o',[ recordInfo, process_key, pair ]);
+		  }
+		  
+		  if (process){
+			  // Restart recording with new producers..
+			  //stopRecord(peer);
+			  
+			  //resumeRecord = true;
+			  //let process=peer.process.get(process_key);
+			  //recordInfo.fileName=process.fileName;
+			  process.kill();
+			  // process.close();
+			  peer.process.set(process_key, this.getProcess(recordInfo));
+			  logger.info('startRecord: restart process %o',[ recordInfo, process_key, pair ]);
+		  }	 
+		  
+		  if (!process){
+			  peer.process.set(process_key, this.getProcess(recordInfo));
+			  logger.info('startRecord: start new process %o',[ recordInfo, process_key, pair ]);
+		  }
 
+			  if (pair['video'])
+				peer.plainTransports.get(pair['video'].producer).process=process_key;
+			  if (pair['audio'])
+				peer.plainTransports.get(pair['audio'].producer).process=process_key;
+		
+	  }
+	  this._notification(peer.socket, 'start_record', null, true, true);
+		
 	  setTimeout(async () => {
-		for (const consumer of peer.consumers.values()) {
+		 // logger.info('startRecord: Resume: %o',peer.plainConsumers);
+		for (let consumerId of peer.plainConsumers.keys()) {
 		  // Sometimes the consumer gets resumed before the GStreamer process has fully started
 		  // so wait a couple of seconds
+		  logger.info('startRecord: Get consumer: %o',consumerId);
+		  const consumer = peer.getConsumer(consumerId);
+		  //logger.info('startRecord: Get consumer: %o',consumer);
 		  if (consumer.paused) {
-			logger.info('startRecord: Resume consumer: %o',consumer.id);
+			logger.info('startRecord: Resume consumer: %o',consumerId);
 			await consumer.resume();
 		  }
 		}
@@ -844,6 +1113,7 @@ class Room extends EventEmitter
 		peer.on('close', () =>
 		{
 			this._handlePeerClose(peer);
+			this.stopRecord(peer);
 		});
 
 		peer.on('displayNameChanged', ({ oldDisplayName }) =>
@@ -1275,11 +1545,16 @@ class Room extends EventEmitter
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
 
-				producer.close();
+				if (this._recorded) { // Restart record without producer
+					await this.stopRecordProducer(peer,producer);
+					//await this.startRecord(peer);
+				}
 
-				// Remove from its map.
+				producer.close();
 				peer.removeProducer(producer.id);
 
+				// Remove from its map.
+				
 				cb();
 
 				break;
@@ -1784,7 +2059,6 @@ class Room extends EventEmitter
 						
 						this.startRecord(peerMember);
 						
-						this._notification(peer.socket, 'moderator:start_record', null, true);
 					}
 				}
 				cb();

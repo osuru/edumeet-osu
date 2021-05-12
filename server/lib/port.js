@@ -6,23 +6,27 @@ const TIMEOUT = 400;
 
 const takenPortSet = new Set();
 
-module.exports.getPort = async () => {
+module.exports.getPort = async (count=1) => {
   let port = getRandomPort();
 
-  while(takenPortSet.has(port)) {
+  while(takenPortSet.has(port) || (count==2 &&  takenPortSet.has(port+1)) ) {
     port = getRandomPort();
 
     try {
-      // Check that the port is available to use
+      // Check that the port and port+1 is available to use
       await isPortOpen(port);
+	  await isPortOpen(port+1);
     } catch (error) {
       console.error('getPort() port is taken [port:%d]', port);
-      takenPortSet.add(port);
+      takenPortSet.add(port);   //RTP PORT
+	  if (count==2)
+		  takenPortSet.add(port+1); // RTCP PORT
     }
   }
 
-  takenPortSet.add(port);
-
+  takenPortSet.add(port);			//RTP PORT
+	  if (count==2)
+		  takenPortSet.add(port+1); // RTCP PORT
   return port;
 };
 
