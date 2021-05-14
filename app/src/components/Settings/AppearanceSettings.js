@@ -43,10 +43,12 @@ const AppearanceSettings = (props) =>
 		locale,
 		settings,
 		onTogglePermanentTopBar,
+		onToggleOpacityTopBar,
 		onToggleHiddenControls,
 		onToggleButtonControlBar,
 		onToggleShowNotifications,
 		onToggleDrawerOverlayed,
+		onToggleDrawerOverlayedOp,
 		onToggleMirrorOwnVideo,
 		handleChangeMode,
 		handleChangeAspectRatio,
@@ -200,6 +202,16 @@ const AppearanceSettings = (props) =>
 			/>
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
+				control={
+					<Switch checked={settings.opacityTopBar} onChange={onToggleOpacityTopBar} value='opacityTopBar' />}
+				labelPlacement='start'
+				label={intl.formatMessage({
+					id             : 'settings.opacueTopBar',
+					defaultMessage : 'opacity top bar'
+				})}
+			/>
+			<FormControlLabel
+				className={classnames(classes.setting, classes.switchLabel)}
 				control={<Switch checked={settings.hiddenControls} onChange={onToggleHiddenControls} value='hiddenControls' />}
 				labelPlacement='start'
 				label={intl.formatMessage({
@@ -225,6 +237,15 @@ const AppearanceSettings = (props) =>
 						id             : 'settings.drawerOverlayed',
 						defaultMessage : 'Side drawer over content'
 					})}
+				/> &&
+				<FormControlLabel
+					className={classnames(classes.setting, classes.switchLabel)}
+					control={<Switch checked={settings.drawerOverlayedOp} onChange={onToggleDrawerOverlayedOp} value='drawerOverlayedOp' />}
+					labelPlacement='start'
+					label={intl.formatMessage({
+						id             : 'settings.drawerOpacity',
+						defaultMessage : 'Side drawer over content Opacity'
+					})}
 				/>
 			}
 			<FormControlLabel
@@ -242,15 +263,17 @@ const AppearanceSettings = (props) =>
 
 AppearanceSettings.propTypes =
 {
-	roomClient          				  : PropTypes.any.isRequired,
+	roomClient                : PropTypes.any.isRequired,
 	isMobile                  : PropTypes.bool.isRequired,
 	room                      : appPropTypes.Room.isRequired,
 	settings                  : PropTypes.object.isRequired,
 	onTogglePermanentTopBar   : PropTypes.func.isRequired,
+	onToggleOpacityTopBar     : PropTypes.func.isRequired,
 	onToggleHiddenControls    : PropTypes.func.isRequired,
 	onToggleButtonControlBar  : PropTypes.func.isRequired,
 	onToggleShowNotifications : PropTypes.func.isRequired,
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
+	onToggleDrawerOverlayedOp : PropTypes.func.isRequired,
 	onToggleMirrorOwnVideo    : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
 	handleChangeAspectRatio   : PropTypes.func.isRequired,
@@ -271,10 +294,12 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
 	onTogglePermanentTopBar   : settingsActions.togglePermanentTopBar,
+	onToggleOpacityTopBar     : settingsActions.toggleOpacityTopBar,
 	onToggleHiddenControls    : settingsActions.toggleHiddenControls,
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
 	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
+	onToggleDrawerOverlayedOp : settingsActions.toggleDrawerOverlayedOp,
 	onToggleMirrorOwnVideo    : settingsActions.toggleMirrorOwnVideo,
 	handleChangeMode          : roomActions.setDisplayMode,
 	handleChangeAspectRatio   : settingsActions.setAspectRatio

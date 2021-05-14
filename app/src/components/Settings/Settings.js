@@ -44,6 +44,11 @@ const styles = (theme) =>
 			[theme.breakpoints.down('xs')] :
 			{
 				width : '90vw'
+			},
+			opacity   : 0.5,
+			'&:hover' :
+			{
+				opacity : 1
 			}
 		},
 		tabsHeader :
@@ -62,11 +67,26 @@ const Settings = ({
 {
 	const intl = useIntl();
 
+	let hover=false;
+
+	const setHover = (st) =>
+	{
+		hover = st;
+	};
+
 	return (
 		<Dialog
 			className={classes.root}
 			open={settingsOpen}
 			onClose={() => handleCloseSettings(false)}
+			onMouseEnter={() =>
+			{
+				setHover(true);
+			}}
+			onMouseLeave={() =>
+			{
+				setHover(false);
+			}}
 			classes={{
 				paper : classes.dialogPaper
 			}}

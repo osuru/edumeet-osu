@@ -24,6 +24,7 @@ const initialState =
 	mirrorOwnVideo          : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
+	drawerOverlayedOp       : window.config.drawerOverlayedOp || false,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	mediaPerms              : { audio: true, video: true },
 	...window.config.defaultAudio
@@ -165,6 +166,13 @@ const settings = (state = initialState, action) =>
 			const drawerOverlayed = !state.drawerOverlayed;
 
 			return { ...state, drawerOverlayed };
+		}
+
+		case 'TOGGLE_DRAWER_OVERLAYED_OP':
+		{
+			const drawerOverlayedOp = !state.drawerOverlayedOp;
+
+			return { ...state, drawerOverlayedOp };
 		}
 
 		case 'TOGGLE_HIDDEN_CONTROLS':

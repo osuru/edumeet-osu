@@ -14,6 +14,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
+import classnames from 'classnames';
 import Notifications from './Notifications/Notifications';
 import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
@@ -50,18 +51,18 @@ const styles = (theme) =>
 		drawer :
 		{
 			width                          : '30vw',
-			flexShrink                     : 0,
+			flexShrink                     : 1,
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '50vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
@@ -70,22 +71,30 @@ const styles = (theme) =>
 		},
 		drawerPaper :
 		{
-			width                          : '30vw',
+			width                          : '20vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '50vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
 				width : '90vw'
+			}
+		},
+		opacity :
+		{
+			opacity   : 0.3,
+			'&:hover' :
+			{
+				opacity : 1
 			}
 		}
 	});
@@ -171,6 +180,7 @@ class Room extends React.PureComponent
 			showNotifications,
 			buttonControlBar,
 			drawerOverlayed,
+			drawerOverlayedOp,
 			toolAreaOpen,
 			toggleToolArea,
 			classes,
@@ -227,13 +237,14 @@ class Room extends React.PureComponent
 							<SwipeableDrawer
 								container={container}
 								variant='temporary'
-								anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+								anchor={theme.direction !== 'rtl' ? 'right' : 'left'}
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
 								onOpen={() => toggleToolArea()}
-								classes={{
-									paper : classes.drawerPaper
-								}}
+								classes={classnames(
+									classes.drawerPaper,
+									(drawerOverlayedOp)? classes.opacity : null
+								)}
 								ModalProps={{
 									keepMounted : true // Better open performance on mobile.
 								}}
@@ -251,8 +262,12 @@ class Room extends React.PureComponent
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
 								classes={{
-									paper : classes.drawerPaper
+									paper : classnames(
+										classes.drawerPaper,
+										classes.opacity
+									)
 								}}
+
 							>
 								<MeetingDrawer closeDrawer={toggleToolArea} />
 							</Drawer>
@@ -303,6 +318,7 @@ Room.propTypes =
 	showNotifications  : PropTypes.bool.isRequired,
 	buttonControlBar   : PropTypes.bool.isRequired,
 	drawerOverlayed    : PropTypes.bool.isRequired,
+	drawerOverlayedOp  : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
@@ -318,6 +334,7 @@ const mapStateToProps = (state) =>
 		showNotifications : state.settings.showNotifications,
 		buttonControlBar  : state.settings.buttonControlBar,
 		drawerOverlayed   : state.settings.drawerOverlayed,
+		drawerOverlayedOp : state.settings.drawerOverlayedOp,
 		toolAreaOpen      : state.toolarea.toolAreaOpen
 	});
 
@@ -347,6 +364,7 @@ export default connect(
 				prev.settings.showNotifications === next.settings.showNotifications &&
 				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
 				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
+				prev.settings.drawerOverlayedOp === next.settings.drawerOverlayedOp &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}

@@ -38,6 +38,14 @@ const styles = (theme) =>
 			display       : 'flex',
 			flexDirection : 'row'
 		},
+		opacity :
+		{
+			opacity   : 0.3,
+			'&:hover' :
+			{
+				opacity : 1
+			}
+		},
 		tabsHeader :
 		{
 			flexGrow : 1
@@ -63,7 +71,7 @@ const MeetingDrawer = (props) =>
 		<div className={classes.root}>
 			<AppBar
 				position='static'
-				color='default'
+				color='red'
 				className={classes.appBar}
 			>
 				<Tabs
