@@ -5,20 +5,24 @@ const Logger = require('./Logger');
 const logger = new Logger('gstreamer');
 
 const child_process = require('child_process');
+var kill = require('tree-kill');
 const { EventEmitter } = require('events');
 const shell = require('shelljs');
-
+const config = require('../config/config');
 const { getCodecInfoFromRtpParameters } = require('./utils');
 
-const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || '/tmp';
+const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || config.mediasoup.recording.path || '/tmp';
 
-const GSTREAMER_DEBUG_LEVEL = process.env.GSTREAMER_DEBUG_LEVEL || 3;
+const GSTREAMER_DEBUG_LEVEL = process.env.GSTREAMER_DEBUG_LEVEL || config.mediasoup.recording.gstreamer_debug || 3;
 const GSTREAMER_COMMAND = 'gst-launch-1.0';
 const GSTREAMER_OPTIONS = '-v -e';
 
 module.exports = class GStreamer {
   constructor (rtpParameters) {
     this._rtpParameters = rtpParameters;
+	this.producers = rtpParameters;
+	this.fileName=rtpParameters.fileName;
+	this._state=true;
     this._process = undefined;
     this._observer = new EventEmitter();
     this._createProcess();
@@ -28,6 +32,7 @@ module.exports = class GStreamer {
     // Use the commented out exe to create gstreamer dot file
     // const exe = `GST_DEBUG=${GSTREAMER_DEBUG_LEVEL} GST_DEBUG_DUMP_DOT_DIR=./dump ${GSTREAMER_COMMAND} ${GSTREAMER_OPTIONS}`;
     const exe = `GST_DEBUG=${GSTREAMER_DEBUG_LEVEL} ${GSTREAMER_COMMAND} ${GSTREAMER_OPTIONS}`;
+	logger.info('gstream CMD: %o %o',exe,this._commandArgs);
     this._process = child_process.spawn(exe, this._commandArgs, {
       detached: false,
       shell: true
@@ -65,13 +70,18 @@ module.exports = class GStreamer {
 
   kill () {
     logger.info('kill() [pid:%d]', this._process.pid);
-    this._process.kill('SIGINT');
+    // this._process.kill('SIGINT');
+	// process.kill(-this._process.pid);
+	kill(this._process.pid,'SIGTERM') ;
+	this._state=false;
   }
 
   // Build the gstreamer child process args
   get _commandArgs () {
+	  let cname=' ';
     let commandArgs = [
-      `rtpbin name=rtpbin latency=50 buffer-mode=0 sdes="application/x-rtp-source-sdes, cname=(string)${this._rtpParameters.video.rtpParameters.rtcp.cname}"`,
+     // `rtpbin name=rtpbin latency=50 buffer-mode=0 sdes="application/x-rtp-source-sdes, cname=(string)${this._rtpParameters.video.rtpParameters.rtcp.cname}"`,
+	  `rtpbin name=rtpbin latency=50 buffer-mode=0 sdes="application/x-rtp-source-sdes"`,
       '!'
     ];
 
@@ -85,6 +95,7 @@ module.exports = class GStreamer {
 
   get _videoArgs () {
     const { video } = this._rtpParameters;
+	if (!video) return [];
     // Get video codec info
     const videoCodecInfo = getCodecInfoFromRtpParameters('video', video.rtpParameters);
 
@@ -105,6 +116,7 @@ module.exports = class GStreamer {
 
   get _audioArgs() {
     const { audio } = this._rtpParameters;
+	if (!audio) return [];
     // Get audio codec info
     const audioCodecInfo = getCodecInfoFromRtpParameters('audio', audio.rtpParameters);
 
@@ -129,26 +141,39 @@ module.exports = class GStreamer {
 
   get _rtcpArgs () {
     const { video, audio } = this._rtpParameters;
-
-    return [
-      `udpsrc address=127.0.0.1 port=${video.remoteRtcpPort}`,
+	
+	let videoArr = [];
+	let audioArr = [];
+	let ip=config.mediasoup.recording.ip || '127.0.0.1';
+	if (video) videoArr = [
+	   `udpsrc address=${ip} port=${video.remoteRtcpPort}`,
       '!',
       'rtpbin.recv_rtcp_sink_0 rtpbin.send_rtcp_src_0',
       '!',
-      `udpsink host=127.0.0.1 port=${video.localRtcpPort} bind-address=127.0.0.1 bind-port=${video.remoteRtcpPort} sync=false async=false`,
-      `udpsrc address=127.0.0.1 port=${audio.remoteRtcpPort}`,
+      `udpsink host=${ip} port=${video.localRtcpPort} bind-address=${ip} bind-port=${video.remoteRtcpPort} sync=false async=true`,
+		];
+
+	if (audio) audioArr = [
+      `udpsrc address=${ip} port=${audio.remoteRtcpPort}`,
       '!',
       'rtpbin.recv_rtcp_sink_1 rtpbin.send_rtcp_src_1',
       '!',
-      `udpsink host=127.0.0.1 port=${audio.localRtcpPort} bind-address=127.0.0.1 bind-port=${audio.remoteRtcpPort} sync=false async=false`
+      `udpsink host=${ip} port=${audio.localRtcpPort} bind-address=${ip} bind-port=${audio.remoteRtcpPort} sync=false async=true`
+	];
+	
+    return [
+	...videoArr,
+	...audioArr
     ];
   }
-
+  
+  get state(){ return this._state; }
+	
   get _sinkArgs () {
     return [
       'webmmux name=mux',
       '!',
-      `filesink location=${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}.webm`
+      `filesink append=true location=${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}.webm`
     ];
   }
 }

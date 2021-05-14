@@ -1,4 +1,4 @@
-# Modified edumeet
+# Modified edumeet with recording features
 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
@@ -25,11 +25,18 @@ NEW:
 1) Install NODE
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
+2) Install ffmpeg or gstreamer
+2.1) ffmpeg - `apt install ffmpeg`
+Known bugs - ffmpeg not start recording imegiately, got error `cur_dts is invalid`. Sometimes recording start for 1-3 minutes.
+
+2.2) gstreamer - `apt install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-tools gstreamer1.0-plugins-rtp` 
+We recommended using gstreamer
+
 ### If use docker - skip this 
 ```bash
 $ sudo apt install git npm build-essential redis
-$ git clone https://github.com/edumeet/edumeet.git
-$ cd edumeet
+$ git clone https://github.com/osuru/edumeet-osu.git
+$ cd edumeet-osu
 $ cp server/config/config.example.js server/config/config.js
 $ cp app/public/config/config.example.js app/public/config/config.js
 ```

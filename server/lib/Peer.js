@@ -54,9 +54,13 @@ class Peer extends EventEmitter
 
 		this._consumers = new Map();
 		
-		this.remotePorts = [];
+		this.remotePorts = new Map(); // stack for save ports to recors
 		
-		this.process = undefined;
+		this.plainTransports = new Map(); //stack for save transport.id to recors
+		
+		this.plainConsumers = new Map(); //stack for save consumer.id to recors
+		
+		this.process = new Map();
 
 		this._handlePeer();
 	}
@@ -69,7 +73,7 @@ class Peer extends EventEmitter
 
 		// Iterate and close all mediasoup Transport associated to this Peer, so all
 		// its Producers and Consumers will also be closed.
-		for (const transport of this.transports.values())
+		for (const transport of this._transports.values())
 		{
 			transport.close();
 		}
