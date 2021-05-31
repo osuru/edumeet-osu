@@ -4,6 +4,12 @@ export const setMe = ({ peerId, loginEnabled }) =>
 		payload : { peerId, loginEnabled }
 	});
 
+export const setRef = ({ ref1, ref2 }) =>
+	({
+		type    : 'SET_REF',
+		payload : { ref1, ref2 }
+	});
+
 export const setBrowser = (browser) =>
 	({
 		type    : 'SET_BROWSER',

@@ -206,7 +206,7 @@ const AppearanceSettings = (props) =>
 					<Switch checked={settings.opacityTopBar} onChange={onToggleOpacityTopBar} value='opacityTopBar' />}
 				labelPlacement='start'
 				label={intl.formatMessage({
-					id             : 'settings.opacueTopBar',
+					id             : 'settings.opacityTopBar',
 					defaultMessage : 'opacity top bar'
 				})}
 			/>
@@ -237,17 +237,18 @@ const AppearanceSettings = (props) =>
 						id             : 'settings.drawerOverlayed',
 						defaultMessage : 'Side drawer over content'
 					})}
-				/> &&
-				<FormControlLabel
-					className={classnames(classes.setting, classes.switchLabel)}
-					control={<Switch checked={settings.drawerOverlayedOp} onChange={onToggleDrawerOverlayedOp} value='drawerOverlayedOp' />}
-					labelPlacement='start'
-					label={intl.formatMessage({
-						id             : 'settings.drawerOpacity',
-						defaultMessage : 'Side drawer over content Opacity'
-					})}
 				/>
 			}
+			<FormControlLabel
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.drawerOverlayedOp} onChange={onToggleDrawerOverlayedOp} value='drawerOverlayedOp' />}
+				labelPlacement='start'
+				label={intl.formatMessage({
+					id             : 'settings.drawerOverlayedOp',
+					defaultMessage : 'Side drawer opacity'
+				})}
+			/>
+
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
 				control={<Switch checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}

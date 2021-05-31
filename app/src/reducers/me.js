@@ -19,7 +19,9 @@ const initialState =
 	raisedHandInProgress  : false,
 	loggedIn              : false,
 	isSpeaking            : false,
-	isAutoMuted           : true
+	isAutoMuted           : true,
+	ref1                  : null,
+	ref2                  : null
 };
 
 const me = (state = initialState, action) =>
@@ -37,6 +39,20 @@ const me = (state = initialState, action) =>
 				...state,
 				id : peerId,
 				loginEnabled
+			};
+		}
+
+		case 'SET_REF':
+		{
+			const {
+				ref1,
+				ref2
+			} = action.payload;
+
+			return {
+				...state,
+				ref1,
+				ref2
 			};
 		}
 

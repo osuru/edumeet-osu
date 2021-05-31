@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
@@ -20,6 +20,7 @@ import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';
+import Recorder from './Recorder/Recorder';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
@@ -71,7 +72,7 @@ const styles = (theme) =>
 		},
 		drawerPaper :
 		{
-			width                          : '20vw',
+			width                          : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
 				width : '30vw'
@@ -91,7 +92,7 @@ const styles = (theme) =>
 		},
 		opacity :
 		{
-			opacity   : 0.3,
+			// opacity   : 0.3,
 			'&:hover' :
 			{
 				opacity : 1
@@ -111,6 +112,8 @@ class Room extends React.PureComponent
 		{
 			fullscreen : false
 		};
+
+		this.selfRef = React.createRef();
 	}
 
 	waitForHide = idle(() =>
@@ -196,7 +199,7 @@ class Room extends React.PureComponent
 		const container = window !== undefined ? window.document.body : undefined;
 
 		return (
-			<div className={classes.root}>
+			<div className={classes.root} ref={this.selfRef}>
 				{ !isElectron() &&
 					<CookieConsent
 						buttonText={
@@ -258,13 +261,13 @@ class Room extends React.PureComponent
 						<Hidden implementation='css'>
 							<Drawer
 								variant='persistent'
-								anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+								anchor={theme.direction !== 'rtl' ? 'right' : 'left'}
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
 								classes={{
 									paper : classnames(
-										classes.drawerPaper,
-										classes.opacity
+										classes.drawerPaper // ,
+										// classes.opacity
 									)
 								}}
 
@@ -305,6 +308,10 @@ class Room extends React.PureComponent
 				{ room.rolesManagerOpen &&
 					<RolesManager />
 				}
+				<Recorder
+					recorded={this.props.room.recorded}
+					parentRef={this.selfRef}
+				/>
 			</div>
 		);
 	}
