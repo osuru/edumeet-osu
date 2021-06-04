@@ -129,8 +129,10 @@ const styles = (theme) =>
 		},
 		sectionDesktop : {
 			display                      : 'none',
+			flexGrow                     : 1,
 			[theme.breakpoints.up('sm')] : {
-				display : 'flex'
+				display  : 'flex',
+				flexGrow : 1
 			}
 		},
 		sectionMobile : {
@@ -160,6 +162,11 @@ const styles = (theme) =>
 		{
 			top    : 'auto',
 			bottom : 0
+		},
+		icons :
+		{
+			marginLeft  : theme.spacing(1),
+			marginRight : theme.spacing(1)
 		}
 	});
 
@@ -363,6 +370,7 @@ const TopBar = (props) =>
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
 							})}
+							className={classes.icons}
 						>
 							<IconButton
 								aria-owns={
@@ -378,7 +386,7 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 						{ fullscreenEnabled &&
-							<Tooltip title={fullscreenTooltip}>
+							<Tooltip title={fullscreenTooltip} className={classes.icons}>
 								<IconButton
 									aria-label={intl.formatMessage({
 										id             : 'tooltip.enterFullscreen',
@@ -401,6 +409,7 @@ const TopBar = (props) =>
 								id             : 'tooltip.participants',
 								defaultMessage : 'Show participants'
 							})}
+							className={classes.icons}
 						>
 							<IconButton
 								aria-label={intl.formatMessage({
@@ -423,6 +432,7 @@ const TopBar = (props) =>
 								id             : 'tooltip.chat',
 								defaultMessage : 'Show chat'
 							})}
+							className={classes.icons}
 						>
 							<IconButton
 								aria-label={intl.formatMessage({
@@ -441,6 +451,7 @@ const TopBar = (props) =>
 								id             : 'tooltip.settings',
 								defaultMessage : 'Show settings'
 							})}
+							className={classes.icons}
 						>
 							<IconButton
 								aria-label={intl.formatMessage({
@@ -454,7 +465,7 @@ const TopBar = (props) =>
 								<SettingsIcon />
 							</IconButton>
 						</Tooltip>
-						<Tooltip title={lockTooltip}>
+						<Tooltip title={lockTooltip} className={classes.icons}>
 							<span className={classes.disabledButton}>
 								<IconButton
 									aria-label={intl.formatMessage({
@@ -484,7 +495,7 @@ const TopBar = (props) =>
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Tooltip title={startRecordTooltip}>
+						<Tooltip title={startRecordTooltip} className={classes.icons}>
 							<span className={classes.disabledButton}>
 								<IconButton
 									aria-label={intl.formatMessage({
@@ -543,7 +554,7 @@ const TopBar = (props) =>
 							</Tooltip>
 						}
 						{ loginEnabled &&
-							<Tooltip title={loginTooltip}>
+							<Tooltip title={loginTooltip} className={classes.icons}>
 								<IconButton
 									aria-label={intl.formatMessage({
 										id             : 'tooltip.login',
@@ -572,6 +583,7 @@ const TopBar = (props) =>
 								id             : 'tooltip.lobby',
 								defaultMessage : 'Show lobby'
 							})}
+							className={classes.icons}
 						>
 							<span className={classes.disabledButton}>
 								<IconButton
@@ -602,7 +614,7 @@ const TopBar = (props) =>
 							<MoreIcon />
 						</IconButton>
 					</div>
-					<div className={classes.divider} />
+					{/* <div className={classes.divider} /> */}
 
 					<Button
 						aria-label={locale.split(/[-_]/)[0]}

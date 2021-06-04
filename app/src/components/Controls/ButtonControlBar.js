@@ -37,6 +37,7 @@ const styles = (theme) =>
 				flexDirection : 'row',
 				bottom        : theme.spacing(1),
 				left          : '50%',
+				marginBottom  : '64px',
 				transform     : 'translate(-50%, -0%)'
 			}
 		},
