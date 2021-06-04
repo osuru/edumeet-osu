@@ -20,8 +20,8 @@ const styles = (theme) =>
 		root :
 		{
 			width     : '100%',
-			overflowY : 'auto',
-			padding   : theme.spacing(1)
+			overflowY : 'visible',
+			padding   : theme.spacing(2)
 		},
 		list :
 		{

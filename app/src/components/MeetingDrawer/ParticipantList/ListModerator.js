@@ -10,11 +10,12 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding     : theme.spacing(1),
-			display     : 'flex',
-			flexWrap    : 'wrap',
-			marginRight : -theme.spacing(1),
-			marginTop   : -theme.spacing(1)
+			padding       : theme.spacing(0),
+			display       : 'flex',
+			flexDirection : 'column',
+			flexWrap      : 'wrap',
+			marginRight   : -theme.spacing(0),
+			marginTop     : -theme.spacing(0)
 		},
 		button :
 		{

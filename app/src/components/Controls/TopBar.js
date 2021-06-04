@@ -97,7 +97,7 @@ const styles = (theme) =>
 		},
 		divider :
 		{
-			marginLeft : theme.spacing(3)
+			marginLeft : theme.spacing(0)
 		},
 		show :
 		{

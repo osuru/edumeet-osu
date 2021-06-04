@@ -35,7 +35,7 @@ const styles = (theme) =>
 		},
 		appBar :
 		{
-			display       : 'flex',
+			display       : 'static',
 			flexDirection : 'row'
 		},
 		opacity :
