@@ -13,7 +13,9 @@ import Me from '../Containers/Me';
 const PADDING_V = 64;
 const PADDING_H = 50;
 
+
 const FILL_RATE = 0.90;
+
 
 const styles = (theme) =>
 	({

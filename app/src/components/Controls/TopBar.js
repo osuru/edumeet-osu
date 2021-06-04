@@ -160,10 +160,6 @@ const styles = (theme) =>
 		{
 			top    : 'auto',
 			bottom : 0
-		},
-		toolbar :
-		{
-			flexGrow : 1
 		}
 	});
 
@@ -319,14 +315,15 @@ const TopBar = (props) =>
 		<React.Fragment>
 			<AppBar
 				position='fixed'
-				className={classnames(classes.appBar,
-					room.toolbarsVisible || permanentTopBar ?
-						classes.show : classes.hide,
-					!(isMobile || drawerOverlayed) && toolAreaOpen ?
-						classes.persistentDrawerOpen : null,
-					(drawerOverlayedOp) ?
-						classes.opacity : null
-				)}
+				// className={classnames(
+				// 	room.toolbarsVisible || permanentTopBar ?
+				// 		classes.show : classes.hide,
+				// 	!(isMobile || drawerOverlayed) && toolAreaOpen ?
+				// 		classes.persistentDrawerOpen : null,
+				// 	(drawerOverlayedOp) ?
+				// 		classes.opacity : null
+				// )}
+				className={classes.appBar}
 			>
 				<Toolbar
 					className={classes.toolbar}
