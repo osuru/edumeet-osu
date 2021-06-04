@@ -240,7 +240,7 @@ class Room extends React.PureComponent
 							<SwipeableDrawer
 								container={container}
 								variant='temporary'
-								anchor={theme.direction !== 'rtl' ? 'right' : 'left'}
+								anchor={theme.direction !== 'rtl' ? 'left' : 'right'}
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
 								onOpen={() => toggleToolArea()}
@@ -261,7 +261,7 @@ class Room extends React.PureComponent
 						<Hidden implementation='css'>
 							<Drawer
 								variant='persistent'
-								anchor={theme.direction !== 'rtl' ? 'right' : 'left'}
+								anchor={theme.direction !== 'rtl' ? 'left' : 'right'}
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
 								classes={{
