@@ -155,6 +155,11 @@ const styles = (theme) =>
 		moreAction :
 		{
 			margin : theme.spacing(0.5, 0, 0.5, 1.5)
+		},
+		appBar :
+		{
+			top    : 'auto',
+			bottom : 0
 		}
 	});
 
@@ -310,14 +315,15 @@ const TopBar = (props) =>
 		<React.Fragment>
 			<AppBar
 				position='fixed'
-				className={classnames(
-					room.toolbarsVisible || permanentTopBar ?
-						classes.show : classes.hide,
-					!(isMobile || drawerOverlayed) && toolAreaOpen ?
-						classes.persistentDrawerOpen : null,
-					(drawerOverlayedOp) ?
-						classes.opacity : null
-				)}
+				// className={classnames(
+				// 	room.toolbarsVisible || permanentTopBar ?
+				// 		classes.show : classes.hide,
+				// 	!(isMobile || drawerOverlayed) && toolAreaOpen ?
+				// 		classes.persistentDrawerOpen : null,
+				// 	(drawerOverlayedOp) ?
+				// 		classes.opacity : null
+				// )}
+				className={classes.appBar}
 			>
 				<Toolbar>
 					<PulsingBadge
@@ -412,14 +418,14 @@ const TopBar = (props) =>
 						</Tooltip>
 						<Tooltip
 							title={intl.formatMessage({
-								id             : 'tooltip.settings',
-								defaultMessage : 'Show settings'
+								id             : 'tooltip.chat',
+								defaultMessage : 'Show chat'
 							})}
 						>
 							<IconButton
 								aria-label={intl.formatMessage({
-									id             : 'tooltip.settings',
-									defaultMessage : 'Show settings'
+									id             : 'tooltip.chat',
+									defaultMessage : 'Show chat'
 								})}
 								className={classes.actionButton}
 								color='inherit'
@@ -430,14 +436,14 @@ const TopBar = (props) =>
 						</Tooltip>
 						<Tooltip
 							title={intl.formatMessage({
-								id             : 'tooltip.chat',
-								defaultMessage : 'Show chat'
+								id             : 'tooltip.settings',
+								defaultMessage : 'Show settings'
 							})}
 						>
 							<IconButton
 								aria-label={intl.formatMessage({
-									id             : 'tooltip.chat',
-									defaultMessage : 'Show chat'
+									id             : 'tooltip.settings',
+									defaultMessage : 'Show settings'
 								})}
 								className={classes.actionButton}
 								color='inherit'

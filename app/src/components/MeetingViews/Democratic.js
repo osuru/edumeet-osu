@@ -13,7 +13,7 @@ import Me from '../Containers/Me';
 const PADDING_V = 64;
 const PADDING_H = 50;
 
-const FILL_RATE = 0.95;
+const FILL_RATE = 0.9;
 
 const styles = (theme) =>
 	({
@@ -36,8 +36,8 @@ const styles = (theme) =>
 		},
 		showingToolBar :
 		{
-			paddingTop : PADDING_V,
-			transition : 'padding .5s'
+			paddingBottom : PADDING_V,
+			transition    : 'padding .5s'
 		},
 		buttonControlBar :
 		{
