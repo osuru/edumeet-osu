@@ -325,7 +325,9 @@ const TopBar = (props) =>
 				// )}
 				className={classes.appBar}
 			>
-				<Toolbar>
+				<Toolbar
+					className={classes.toolbar}
+				>
 					<PulsingBadge
 						color='secondary'
 						badgeContent={unread}
@@ -631,7 +633,7 @@ const TopBar = (props) =>
 			</AppBar>
 			<Popover
 				anchorEl={anchorEl}
-				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+				anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
 				transformOrigin={{ vertical: 'top', horizontal: 'left' }}
 				open={isMenuOpen}
 				onClose={handleMenuClose}
@@ -763,7 +765,7 @@ const TopBar = (props) =>
 			</Popover>
 			<Menu
 				anchorEl={mobileMoreAnchorEl}
-				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+				anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
 				transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
 				open={isMobileMenuOpen}
 				onClose={handleMenuClose}

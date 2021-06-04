@@ -13,7 +13,9 @@ import Me from '../Containers/Me';
 const PADDING_V = 64;
 const PADDING_H = 50;
 
-const FILL_RATE = 0.9;
+
+const FILL_RATE = 0.90;
+
 
 const styles = (theme) =>
 	({
@@ -44,7 +46,7 @@ const styles = (theme) =>
 			paddingLeft                    : PADDING_H,
 			[theme.breakpoints.down('sm')] :
 			{
-				paddingLeft : 0
+				paddingLeft : PADDING_H
 			}
 		}
 	});
@@ -95,7 +97,6 @@ class Democratic extends React.PureComponent
 		{
 			x = width / Math.ceil(n / rows);
 			y = x / aspectRatio;
-
 			if (height < (y * rows))
 			{
 				y = height / rows;
