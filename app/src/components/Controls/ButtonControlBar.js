@@ -10,8 +10,11 @@ import { withRoomContext } from '../../RoomContext';
 import { useIntl } from 'react-intl';
 import Fab from '@material-ui/core/Fab';
 import Tooltip from '@material-ui/core/Tooltip';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import IconButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
@@ -79,6 +82,10 @@ const styles = (theme) =>
 			{
 				left : '90vw'
 			}
+		},
+		controllButton :
+		{
+			borderRadius : '2em'
 		}
 	});
 
@@ -198,91 +205,110 @@ const ButtonControlBar = (props) =>
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 	return (
-		<div
-			className={
-				classnames(
-					classes.root,
-					hiddenControls ?
-						(toolbarsVisible ? classes.show : classes.hide) :
-						classes.show,
-					toolAreaOpen &&
-						(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
-						classes.move : null
-				)
-			}
-		>
-			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label={intl.formatMessage({
-						id             : 'device.muteAudio',
-						defaultMessage : 'Mute audio'
-					})}
-					className={classes.fab}
-					disabled={!me.canSendMic || me.audioInProgress}
-					color={micState === 'on' ? 'primary' : 'secondary'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						if (micState === 'off')
-							roomClient.updateMic({ start: true });
-						else if (micState === 'on')
-							roomClient.muteMic();
-						else
-							roomClient.unmuteMic();
-					}}
-				>
-					{ micState === 'on' ?
-						<MicIcon />
-						:
-						<MicOffIcon />
-					}
-				</Fab>
-			</Tooltip>
-			<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label={intl.formatMessage({
-						id             : 'device.startVideo',
-						defaultMessage : 'Start video'
-					})}
-					className={classes.fab}
-					disabled={!me.canSendWebcam || me.webcamInProgress}
-					color={webcamState === 'on' ? 'primary' : 'secondary'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						webcamState === 'on' ?
-							roomClient.disableWebcam() :
-							roomClient.updateWebcam({ start: true });
-					}}
-				>
-					{ webcamState === 'on' ?
-						<VideoIcon />
-						:
-						<VideoOffIcon />
-					}
-				</Fab>
-			</Tooltip>
-			{ me.browser.platform !== 'mobile' &&
-				<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
-					<Fab
+		<div>
+			{/* // className={
+			// 	// classnames(
+			// 	// 	classes.root,
+			// 	// 	hiddenControls ?
+			// 	// 		(toolbarsVisible ? classes.show : classes.hide) :
+			// 	// 		classes.show,
+			// 	// 	toolAreaOpen &&
+			// 	// 		(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
+			// 	// 		classes.move : null
+			// 	// )
+			// }
+		// > */}
+			<Tooltip title={micTip}>
+				<ButtonGroup variant='contained' color='primary' className={classes.controllButton}>
+					<IconButton
 						aria-label={intl.formatMessage({
-							id             : 'device.startScreenSharing',
-							defaultMessage : 'Start screen sharing'
+							id             : 'device.muteAudio',
+							defaultMessage : 'Mute audio'
 						})}
 						className={classes.fab}
-						disabled={!me.canShareScreen || me.screenShareInProgress}
-						color={screenState === 'on' ? 'primary' : 'secondary'}
+						disabled={!me.canSendMic || me.audioInProgress}
+						color={micState === 'on' ? 'primary' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
-							if (screenState === 'off')
-								roomClient.updateScreenSharing({ start: true });
-							else if (screenState === 'on')
-								roomClient.disableScreenSharing();
+							if (micState === 'off')
+								roomClient.updateMic({ start: true });
+							else if (micState === 'on')
+								roomClient.muteMic();
+							else
+								roomClient.unmuteMic();
 						}}
 					>
-						<ScreenIcon/>
-					</Fab>
+						{ micState === 'on' ?
+							<MicIcon />
+							:
+							<MicOffIcon />
+						}
+					</IconButton>
+					<IconButton color='inherit'>
+						<ArrowDropUpIcon/>
+					</IconButton>
+				</ButtonGroup>
+			</Tooltip>
+			<Tooltip title={webcamTip}>
+				<ButtonGroup variant='contained'>
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'device.startVideo',
+							defaultMessage : 'Start video'
+						})}
+						className={classes.fab}
+						disabled={!me.canSendWebcam || me.webcamInProgress}
+						color={webcamState === 'on' ? 'primary' : 'secondary'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
+						{
+							webcamState === 'on' ?
+								roomClient.disableWebcam() :
+								roomClient.updateWebcam({ start: true });
+						}}
+					>
+						{ webcamState === 'on' ?
+							<VideoIcon />
+							:
+							<VideoOffIcon />
+						}
+					</IconButton>
+					<IconButton
+						color='inherit'
+					>
+						<ArrowDropUpIcon/>
+					</IconButton>
+				</ButtonGroup>
+			</Tooltip>
+			{ me.browser.platform !== 'mobile' &&
+				<Tooltip title={screenTip}>
+					<ButtonGroup variant='contained'>
+						<IconButton
+							aria-label={intl.formatMessage({
+								id             : 'device.startScreenSharing',
+								defaultMessage : 'Start screen sharing'
+							})}
+							className={classes.fab}
+							disabled={!me.canShareScreen || me.screenShareInProgress}
+							color={screenState === 'on' ? 'primary' : 'secondary'}
+							size={smallScreen ? 'large' : 'medium'}
+							onClick={() =>
+							{
+								if (screenState === 'off')
+									roomClient.updateScreenSharing({ start: true });
+								else if (screenState === 'on')
+									roomClient.disableScreenSharing();
+							}}
+						>
+							<ScreenIcon/>
+						</IconButton>
+						<IconButton
+							color='inherit'
+						>
+							<ArrowDropUpIcon/>
+						</IconButton>
+					</ButtonGroup>
 				</Tooltip>
 			}
 		</div>

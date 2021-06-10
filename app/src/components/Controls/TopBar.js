@@ -13,6 +13,7 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
+import ButtonControlBar from './ButtonControlBar';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
@@ -254,6 +255,7 @@ const TopBar = (props) =>
 		drawerOverlayedOp,
 		toolAreaOpen,
 		isMobile,
+		buttonControlBar,
 		myPicture,
 		loggedIn,
 		loginEnabled,
@@ -373,7 +375,7 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						{/* tooltip for mic & more actions */}
+						{/* tooltip for mic & more actions
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
@@ -409,7 +411,7 @@ const TopBar = (props) =>
 							</ButtonGroup>
 						</Tooltip>
 						{/* tooltip for webcam & more actions */}
-						<Tooltip
+						{/* <Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
@@ -442,9 +444,9 @@ const TopBar = (props) =>
 									<ArrowDropUpIcon/>
 								</IconButton>
 							</ButtonGroup>
-						</Tooltip>
+						</Tooltip> */}
 						{/* tooltip for display & more actions */}
-						<Tooltip
+						{/* <Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
@@ -477,7 +479,10 @@ const TopBar = (props) =>
 									<ArrowDropUpIcon/>
 								</IconButton>
 							</ButtonGroup>
-						</Tooltip>
+						</Tooltip> */}
+						{buttonControlBar &&
+							<ButtonControlBar />
+						}
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
@@ -1211,7 +1216,8 @@ TopBar.propTypes =
 	theme                : PropTypes.object.isRequired,
 	intl                 : PropTypes.object.isRequired,
 	locale               : PropTypes.object.isRequired,
-	localesList          : PropTypes.object.isRequired
+	localesList          : PropTypes.object.isRequired,
+	buttonControlBar     : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -1240,6 +1246,7 @@ const makeMapStateToProps = () =>
 			toolAreaOpen      : state.toolarea.toolAreaOpen,
 			loggedIn          : state.me.loggedIn,
 			loginEnabled      : state.me.loginEnabled,
+			buttonControlBar  : state.settings.buttonControlBar,
 			myPicture         : state.me.picture,
 			unread            : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
@@ -1320,6 +1327,7 @@ export default withRoomContext(connect(
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
+				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.intl.locale === next.intl.locale &&
