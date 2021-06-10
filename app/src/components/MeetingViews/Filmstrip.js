@@ -52,6 +52,7 @@ const styles = () =>
 			{
 				borderColor : 'var(--selected-peer-border-color)'
 			}
+			// paddingBottom : '74px'
 		},
 		hiddenToolBar :
 		{
@@ -60,8 +61,8 @@ const styles = () =>
 		},
 		showingToolBar :
 		{
-			paddingTop : PADDING_V,
-			transition : 'padding .5s'
+			paddingBottom : PADDING_V + 10,
+			transition    : 'padding .5s'
 		}
 	});
 

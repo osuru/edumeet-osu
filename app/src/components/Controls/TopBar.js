@@ -20,9 +20,12 @@ import Toolbar from '@material-ui/core/Toolbar';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Popover from '@material-ui/core/Popover';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import MicIcon from '@material-ui/icons/Mic';
 import MenuIcon from '@material-ui/icons/Menu';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
@@ -32,6 +35,7 @@ import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SecurityIcon from '@material-ui/icons/Security';
 import PeopleIcon from '@material-ui/icons/People';
+import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import ChatIcon from '@material-ui/icons/Chat';
@@ -167,6 +171,10 @@ const styles = (theme) =>
 		{
 			marginLeft  : theme.spacing(1),
 			marginRight : theme.spacing(1)
+		},
+		controllButton :
+		{
+			borderRadius : '2em'
 		}
 	});
 
@@ -365,6 +373,111 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
+						{/* tooltip for mic & more actions */}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.moreActions',
+								defaultMessage : 'More actions'
+							})}
+							className={classes.icons}
+						>
+							<ButtonGroup variant='contained' color='primary' className={classes.controllButton}>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<MicIcon/>
+								</IconButton>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<ArrowDropUpIcon/>
+								</IconButton>
+							</ButtonGroup>
+						</Tooltip>
+						{/* tooltip for webcam & more actions */}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.moreActions',
+								defaultMessage : 'More actions'
+							})}
+							className={classes.icons}
+						>
+							<ButtonGroup variant='contained'>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<SelfViewOnIcon/>
+								</IconButton>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<ArrowDropUpIcon/>
+								</IconButton>
+							</ButtonGroup>
+						</Tooltip>
+						{/* tooltip for display & more actions */}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.moreActions',
+								defaultMessage : 'More actions'
+							})}
+							className={classes.icons}
+						>
+							<ButtonGroup variant='contained'>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<ScreenShareIcon/>
+								</IconButton>
+								<IconButton
+									aria-owns={
+										isMenuOpen &&
+										currentMenu === 'moreActions' ?
+											'material-appbar' : undefined
+									}
+									aria-haspopup
+									onClick={(event) => handleMenuOpen(event, 'moreActions')}
+									color='inherit'
+								>
+									<ArrowDropUpIcon/>
+								</IconButton>
+							</ButtonGroup>
+						</Tooltip>
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
