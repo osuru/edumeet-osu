@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
+import * as roomActions from '../../actions/roomActions';
 import { withRoomContext } from '../../RoomContext';
 import { useIntl } from 'react-intl';
 import Fab from '@material-ui/core/Fab';
@@ -85,7 +86,10 @@ const styles = (theme) =>
 		},
 		controllButton :
 		{
-			borderRadius : '2em'
+			borderRadius : '2em',
+			marginTop    : theme.spacing(1.5),
+			marginLeft   : theme.spacing(0.5),
+			marginRight  : theme.spacing(0.5)
 		}
 	});
 
@@ -94,9 +98,11 @@ const ButtonControlBar = (props) =>
 	const intl = useIntl();
 
 	const {
+		room,
 		roomClient,
 		toolbarsVisible,
 		hiddenControls,
+		setSettingsOpen,
 		drawerOverlayed,
 		toolAreaOpen,
 		me,
@@ -219,15 +225,15 @@ const ButtonControlBar = (props) =>
 			// }
 		// > */}
 			<Tooltip title={micTip}>
-				<ButtonGroup variant='contained' color='primary' className={classes.controllButton}>
+				<ButtonGroup variant='contained' className={classes.controllButton}>
 					<IconButton
 						aria-label={intl.formatMessage({
 							id             : 'device.muteAudio',
 							defaultMessage : 'Mute audio'
 						})}
-						className={classes.fab}
+						// className={classes.fab}
 						disabled={!me.canSendMic || me.audioInProgress}
-						color={micState === 'on' ? 'primary' : 'secondary'}
+						color={micState === 'on' ? 'inherit' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
@@ -245,21 +251,14 @@ const ButtonControlBar = (props) =>
 							<MicOffIcon />
 						}
 					</IconButton>
-					<IconButton color='inherit'>
-						<ArrowDropUpIcon/>
-					</IconButton>
-				</ButtonGroup>
-			</Tooltip>
-			<Tooltip title={webcamTip}>
-				<ButtonGroup variant='contained'>
 					<IconButton
 						aria-label={intl.formatMessage({
 							id             : 'device.startVideo',
 							defaultMessage : 'Start video'
 						})}
-						className={classes.fab}
+						// className={classes.fab}
 						disabled={!me.canSendWebcam || me.webcamInProgress}
-						color={webcamState === 'on' ? 'primary' : 'secondary'}
+						color={webcamState === 'on' ? 'inherit' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
@@ -276,22 +275,55 @@ const ButtonControlBar = (props) =>
 					</IconButton>
 					<IconButton
 						color='inherit'
+						onClick={() => setSettingsOpen(!room.settingsOpen)}
 					>
 						<ArrowDropUpIcon/>
 					</IconButton>
 				</ButtonGroup>
 			</Tooltip>
+			{/* <Tooltip title={webcamTip} className={classes.controllButton}>
+				<ButtonGroup variant='contained'>
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'device.startVideo',
+							defaultMessage : 'Start video'
+						})}
+						className={classes.fab}
+						disabled={!me.canSendWebcam || me.webcamInProgress}
+						color={webcamState === 'on' ? 'inherit' : 'secondary'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
+						{
+							webcamState === 'on' ?
+								roomClient.disableWebcam() :
+								roomClient.updateWebcam({ start: true });
+						}}
+					>
+						{ webcamState === 'on' ?
+							<VideoIcon />
+							:
+							<VideoOffIcon />
+						}
+					</IconButton>
+					<IconButton
+						color='inherit'
+						onClick={() => setSettingsOpen(!room.settingsOpen)}
+					>
+						<ArrowDropUpIcon/>
+					</IconButton>
+				</ButtonGroup>
+			</Tooltip> */}
 			{ me.browser.platform !== 'mobile' &&
-				<Tooltip title={screenTip}>
+				<Tooltip title={screenTip} className={classes.controllButton}>
 					<ButtonGroup variant='contained'>
 						<IconButton
 							aria-label={intl.formatMessage({
 								id             : 'device.startScreenSharing',
 								defaultMessage : 'Start screen sharing'
 							})}
-							className={classes.fab}
+							// className={classes.fab}
 							disabled={!me.canShareScreen || me.screenShareInProgress}
-							color={screenState === 'on' ? 'primary' : 'secondary'}
+							color={screenState === 'on' ? 'inherit' : 'secondary'}
 							size={smallScreen ? 'large' : 'medium'}
 							onClick={() =>
 							{
@@ -303,11 +335,6 @@ const ButtonControlBar = (props) =>
 						>
 							<ScreenIcon/>
 						</IconButton>
-						<IconButton
-							color='inherit'
-						>
-							<ArrowDropUpIcon/>
-						</IconButton>
 					</ButtonGroup>
 				</Tooltip>
 			}
@@ -318,10 +345,12 @@ const ButtonControlBar = (props) =>
 ButtonControlBar.propTypes =
 {
 	roomClient      : PropTypes.any.isRequired,
+	room            : appPropTypes.Room.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	hiddenControls  : PropTypes.bool.isRequired,
 	drawerOverlayed : PropTypes.bool.isRequired,
 	toolAreaOpen    : PropTypes.bool.isRequired,
+	setSettingsOpen : PropTypes.func.isRequired,
 	me              : appPropTypes.Me.isRequired,
 	micProducer     : appPropTypes.Producer,
 	webcamProducer  : appPropTypes.Producer,
@@ -332,6 +361,7 @@ ButtonControlBar.propTypes =
 
 const mapStateToProps = (state) =>
 	({
+		room            : state.room,
 		toolbarsVisible : state.room.toolbarsVisible,
 		hiddenControls  : state.settings.hiddenControls,
 		drawerOverlayed : state.settings.drawerOverlayed,
@@ -340,9 +370,17 @@ const mapStateToProps = (state) =>
 		me              : state.me
 	});
 
+const mapDispatchToProps = (dispatch) =>
+	({
+		setSettingsOpen : (settingsOpen) =>
+		{
+			dispatch(roomActions.setSettingsOpen(settingsOpen));
+		}
+	});
+
 export default withRoomContext(connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
@@ -350,6 +388,7 @@ export default withRoomContext(connect(
 			return (
 				Math.round(prev.peerVolumes[prev.me.id]) ===
 				Math.round(next.peerVolumes[prev.me.id]) &&
+				prev.room === next.room &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.settings.hiddenControls === next.settings.hiddenControls &&
 				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&

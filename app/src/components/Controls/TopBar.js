@@ -50,6 +50,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import MediaSettings from '../Settings/MediaSettings';
 
 const styles = (theme) =>
 	({
@@ -149,7 +150,7 @@ const styles = (theme) =>
 		actionButton :
 		{
 			margin  : theme.spacing(1, 0),
-			padding : theme.spacing(0, 1)
+			padding : theme.spacing(1, 1)
 		},
 		disabledButton :
 		{
