@@ -50,6 +50,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import MediaSettings from '../Settings/MediaSettings';
 
 const styles = (theme) =>
 	({
@@ -564,7 +565,7 @@ const TopBar = (props) =>
 								<ChatIcon />
 							</IconButton>
 						</Tooltip>
-						{/* <Tooltip
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.settings',
 								defaultMessage : 'Show settings'
@@ -582,7 +583,7 @@ const TopBar = (props) =>
 							>
 								<SettingsIcon />
 							</IconButton>
-						</Tooltip> */}
+						</Tooltip>
 						<Tooltip title={lockTooltip} className={classes.icons}>
 							<span className={classes.disabledButton}>
 								<IconButton
