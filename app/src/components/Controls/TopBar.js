@@ -172,7 +172,8 @@ const styles = (theme) =>
 		icons :
 		{
 			marginLeft  : theme.spacing(1),
-			marginRight : theme.spacing(1)
+			marginRight : theme.spacing(1),
+			width       : '4%'
 		},
 		controllButton :
 		{
@@ -585,64 +586,64 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 						<Tooltip title={lockTooltip} className={classes.icons}>
-							<span className={classes.disabledButton}>
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'tooltip.lockRoom',
-										defaultMessage : 'Lock room'
-									})}
-									className={classes.actionButton}
-									color='inherit'
-									disabled={!canLock}
-									onClick={() =>
+							{/* <span className={classes.disabledButton}> */}
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.lockRoom',
+									defaultMessage : 'Lock room'
+								})}
+								className={classes.actionButton}
+								color='inherit'
+								disabled={!canLock}
+								onClick={() =>
+								{
+									if (room.locked)
 									{
-										if (room.locked)
-										{
-											roomClient.unlockRoom();
-										}
-										else
-										{
-											roomClient.lockRoom();
-										}
-									}}
-								>
-									{ room.locked ?
-										<LockIcon />
-										:
-										<LockOpenIcon />
+										roomClient.unlockRoom();
 									}
-								</IconButton>
-							</span>
+									else
+									{
+										roomClient.lockRoom();
+									}
+								}}
+							>
+								{ room.locked ?
+									<LockIcon />
+									:
+									<LockOpenIcon />
+								}
+							</IconButton>
+							{/* </span> */}
 						</Tooltip>
 						<Tooltip title={startRecordTooltip} className={classes.icons}>
-							<span className={classes.disabledButton}>
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'tooltip.startRecording',
-										defaultMessage : 'Start recording'
-									})}
-									className={classes.actionButton}
-									color='inherit'
-									disabled={!canRecord}
-									onClick={() =>
+							{/* <span className={classes.disabledButton}> */}
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.startRecording',
+									defaultMessage : 'Start recording'
+								})}
+								className={classes.actionButton}
+								color='inherit'
+								disabled={!canRecord}
+								onClick={() =>
+								{
+									if (!room.recorded)
 									{
-										if (!room.recorded)
-										{
-											roomClient.startRecording();
-										}
-										else
-										{
-											roomClient.stopRecording();
-										}
-									}}
-								>
-									{ !room.recorded ?
-										<RadioButtonCheckedOutlinedIcon />
-										:
-										<RemoveCircleOutlinedIcon />
+										roomClient.startRecording();
 									}
-								</IconButton>
-							</span>
+									else
+									{
+										roomClient.stopRecording();
+									}
+								}}
+							>
+								{ !room.recorded ?
+									<RadioButtonCheckedOutlinedIcon />
+									:
+									<RemoveCircleOutlinedIcon />
+								}
+							</IconButton>
+							{/* </span> */}
 						</Tooltip>
 						{ lobbyPeers.length > 0 &&
 							<Tooltip
@@ -651,25 +652,25 @@ const TopBar = (props) =>
 									defaultMessage : 'Show lobby'
 								})}
 							>
-								<span className={classes.disabledButton}>
-									<IconButton
-										aria-label={intl.formatMessage({
-											id             : 'tooltip.lobby',
-											defaultMessage : 'Show lobby'
-										})}
-										className={classes.actionButton}
-										color='inherit'
-										disabled={!canPromote}
-										onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+								{/* <span className={classes.disabledButton}> */}
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.lobby',
+										defaultMessage : 'Show lobby'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canPromote}
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+								>
+									<PulsingBadge
+										color='secondary'
+										badgeContent={lobbyPeers.length}
 									>
-										<PulsingBadge
-											color='secondary'
-											badgeContent={lobbyPeers.length}
-										>
-											<SecurityIcon />
-										</PulsingBadge>
-									</IconButton>
-								</span>
+										<SecurityIcon />
+									</PulsingBadge>
+								</IconButton>
+								{/* </span> */}
 							</Tooltip>
 						}
 						{ loginEnabled &&
