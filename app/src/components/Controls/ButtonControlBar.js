@@ -19,6 +19,8 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
+import { green, purple } from '@material-ui/core/colors';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const styles = (theme) =>
 	({
@@ -92,6 +94,27 @@ const styles = (theme) =>
 			marginRight  : theme.spacing(0.5)
 		}
 	});
+
+const ColorMicOn = withStyles((theme) =>
+	({
+		root : {
+			color : green[500]
+		}
+	}))(MicIcon);
+
+const ColorVidOn = withStyles((theme) =>
+	({
+		root : {
+			color : green[500]
+		}
+	}))(VideoIcon);
+
+const ColorScreenIconOn = withStyles((theme) =>
+	({
+		root : {
+			color : green[500]
+		}
+	}))(ScreenIcon);
 
 const ButtonControlBar = (props) =>
 {
@@ -246,7 +269,7 @@ const ButtonControlBar = (props) =>
 						}}
 					>
 						{ micState === 'on' ?
-							<MicIcon />
+							<ColorMicOn />
 							:
 							<MicOffIcon />
 						}
@@ -258,7 +281,7 @@ const ButtonControlBar = (props) =>
 						})}
 						// className={classes.fab}
 						disabled={!me.canSendWebcam || me.webcamInProgress}
-						color={webcamState === 'on' ? 'inherit' : 'secondary'}
+						color='secondary'
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
@@ -268,7 +291,7 @@ const ButtonControlBar = (props) =>
 						}}
 					>
 						{ webcamState === 'on' ?
-							<VideoIcon />
+							<ColorVidOn />
 							:
 							<VideoOffIcon />
 						}
@@ -277,7 +300,7 @@ const ButtonControlBar = (props) =>
 						color='inherit'
 						onClick={() => setSettingsOpen(!room.settingsOpen)}
 					>
-						<ArrowDropUpIcon/>
+						<SettingsIcon/>
 					</IconButton>
 				</ButtonGroup>
 			</Tooltip>
@@ -323,7 +346,7 @@ const ButtonControlBar = (props) =>
 							})}
 							// className={classes.fab}
 							disabled={!me.canShareScreen || me.screenShareInProgress}
-							color={screenState === 'on' ? 'inherit' : 'secondary'}
+							color='secondary'
 							size={smallScreen ? 'large' : 'medium'}
 							onClick={() =>
 							{
@@ -333,7 +356,11 @@ const ButtonControlBar = (props) =>
 									roomClient.disableScreenSharing();
 							}}
 						>
-							<ScreenIcon/>
+							{ screenState === 'off' ?
+								<ScreenIcon />
+								:
+								<ColorScreenIconOn/>
+							}
 						</IconButton>
 					</ButtonGroup>
 				</Tooltip>
