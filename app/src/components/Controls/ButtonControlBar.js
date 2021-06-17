@@ -232,22 +232,10 @@ const ButtonControlBar = (props) =>
 		});
 	}
 
-	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+	const smallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
 	return (
 		<div>
-			{/* // className={
-			// 	// classnames(
-			// 	// 	classes.root,
-			// 	// 	hiddenControls ?
-			// 	// 		(toolbarsVisible ? classes.show : classes.hide) :
-			// 	// 		classes.show,
-			// 	// 	toolAreaOpen &&
-			// 	// 		(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
-			// 	// 		classes.move : null
-			// 	// )
-			// }
-		// > */}
 			<Tooltip title={micTip}>
 				<ButtonGroup variant='contained' className={classes.controllButton}>
 					<IconButton

@@ -128,7 +128,7 @@ const styles = (theme) =>
 		{
 			display                      : 'none',
 			marginLeft                   : 20,
-			[theme.breakpoints.up('sm')] :
+			[theme.breakpoints.up('md')] :
 			{
 				display : 'block'
 			}
@@ -138,11 +138,12 @@ const styles = (theme) =>
 			flexGrow                     : 0,
 			[theme.breakpoints.up('md')] : {
 				display  : 'flex',
-				flexGrow : 0
+				flexGrow : 1
 			}
 		},
 		sectionMobile : {
 			display                      : 'flex',
+			flexGrow                     : 1,
 			[theme.breakpoints.up('md')] : {
 				display : 'none'
 			}
@@ -461,7 +462,7 @@ const TopBar = (props) =>
 								<ChatIcon />
 							</IconButton>
 						</Tooltip>
-						<Tooltip
+						{/* <Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.settings',
 								defaultMessage : 'Show settings'
@@ -479,7 +480,7 @@ const TopBar = (props) =>
 							>
 								<SettingsIcon />
 							</IconButton>
-						</Tooltip>
+						</Tooltip> */}
 						<Tooltip title={lockTooltip} className={classes.icons}>
 							{/* <span className={classes.disabledButton}> */}
 							<IconButton
@@ -592,6 +593,9 @@ const TopBar = (props) =>
 						}
 					</div>
 					<div className={classes.sectionMobile}>
+						{buttonControlBar &&
+							<ButtonControlBar />
+						}
 						{ lobbyPeers.length > 0 &&
 						<Tooltip
 							title={intl.formatMessage({
