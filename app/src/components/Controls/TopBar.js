@@ -95,10 +95,9 @@ const styles = (theme) =>
 		logo :
 		{
 			display                      : 'none',
-			marginLeft                   : 20,
-			[theme.breakpoints.up('sm')] :
+			[theme.breakpoints.up('md')] :
 			{
-				display : 'block'
+				display : 'flex'
 			}
 		},
 		divider :
