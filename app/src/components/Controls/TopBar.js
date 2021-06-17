@@ -103,7 +103,7 @@ const styles = (theme) =>
 		},
 		divider :
 		{
-			marginLeft : theme.spacing(0)
+			marginLeft : theme.spacing(1)
 		},
 		show :
 		{
@@ -135,10 +135,10 @@ const styles = (theme) =>
 		},
 		sectionDesktop : {
 			display                      : 'none',
-			flexGrow                     : 1,
-			[theme.breakpoints.up('sm')] : {
+			flexGrow                     : 0,
+			[theme.breakpoints.up('md')] : {
 				display  : 'flex',
-				flexGrow : 1
+				flexGrow : 0
 			}
 		},
 		sectionMobile : {
@@ -377,111 +377,6 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						{/* tooltip for mic & more actions
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.moreActions',
-								defaultMessage : 'More actions'
-							})}
-							className={classes.icons}
-						>
-							<ButtonGroup variant='contained' color='primary' className={classes.controllButton}>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<MicIcon/>
-								</IconButton>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<ArrowDropUpIcon/>
-								</IconButton>
-							</ButtonGroup>
-						</Tooltip>
-						{/* tooltip for webcam & more actions */}
-						{/* <Tooltip
-							title={intl.formatMessage({
-								id             : 'label.moreActions',
-								defaultMessage : 'More actions'
-							})}
-							className={classes.icons}
-						>
-							<ButtonGroup variant='contained'>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<SelfViewOnIcon/>
-								</IconButton>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<ArrowDropUpIcon/>
-								</IconButton>
-							</ButtonGroup>
-						</Tooltip> */}
-						{/* tooltip for display & more actions */}
-						{/* <Tooltip
-							title={intl.formatMessage({
-								id             : 'label.moreActions',
-								defaultMessage : 'More actions'
-							})}
-							className={classes.icons}
-						>
-							<ButtonGroup variant='contained'>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<ScreenShareIcon/>
-								</IconButton>
-								<IconButton
-									aria-owns={
-										isMenuOpen &&
-										currentMenu === 'moreActions' ?
-											'material-appbar' : undefined
-									}
-									aria-haspopup
-									onClick={(event) => handleMenuOpen(event, 'moreActions')}
-									color='inherit'
-								>
-									<ArrowDropUpIcon/>
-								</IconButton>
-							</ButtonGroup>
-						</Tooltip> */}
 						{buttonControlBar &&
 							<ButtonControlBar />
 						}
@@ -734,7 +629,7 @@ const TopBar = (props) =>
 							<MoreIcon />
 						</IconButton>
 					</div>
-					{/* <div className={classes.divider} /> */}
+					<div className={classes.divider} />
 
 					<Button
 						aria-label={locale.split(/[-_]/)[0]}
@@ -772,6 +667,8 @@ const TopBar = (props) =>
 				onExited={handleExited}
 				getContentAnchorEl={null}
 			>
+				{/* с этого места начинается выпадающий список при сжатии иконок
+				сюда добавить кнопки управления */}
 				{ currentMenu === 'moreActions' &&
 					<Paper>
 						<MenuItem
