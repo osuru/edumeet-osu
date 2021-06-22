@@ -44,12 +44,12 @@ const styles = (theme) =>
 			[theme.breakpoints.down('xs')] :
 			{
 				width : '90vw'
-			},
-			opacity   : 0.5,
-			'&:hover' :
-			{
-				opacity : 1
 			}
+			// opacity   : 0.5,
+			// '&:hover' :
+			// {
+			// 	opacity : 1
+			// }
 		},
 		tabsHeader :
 		{
