@@ -365,7 +365,7 @@ const TopBar = (props) =>
 					</PulsingBadge>
 					{ window.config.logo !=='' ?
 						<img alt='Logo'
-							src={window.config.logo}
+							src='https://osu.ru/favicon.ico'
 							className={classes.logo}
 						/> :
 						<Typography
