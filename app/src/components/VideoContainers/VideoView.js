@@ -182,6 +182,7 @@ class VideoView extends React.PureComponent
 	render()
 	{
 		const {
+			parentRef,
 			isMe,
 			isMirrored,
 			isScreen,
@@ -413,6 +414,13 @@ class VideoView extends React.PureComponent
 		this._setTracks(videoTrack);
 	}
 
+	componentDidMount()
+	{
+		const { videoTrack } = this.props;
+
+		this._setTracks(videoTrack);
+	}
+
 	componentWillUnmount()
 	{
 		clearInterval(this._videoResolutionTimer);
@@ -525,7 +533,8 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo                        : PropTypes.object
+	netInfo                        : PropTypes.object,
+	parentRef                      : PropTypes.object
 };
 
 export default withStyles(styles)(VideoView);

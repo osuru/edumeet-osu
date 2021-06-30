@@ -62,6 +62,11 @@ export const togglePermanentTopBar = () =>
 		type : 'TOGGLE_PERMANENT_TOPBAR'
 	});
 
+export const toggleOpacityTopBar = () =>
+	({
+		type : 'TOGGLE_OPACITY_TOPBAR'
+	});
+
 export const toggleButtonControlBar = () =>
 	({
 		type : 'TOGGLE_BUTTON_CONTROL_BAR'
@@ -70,6 +75,11 @@ export const toggleButtonControlBar = () =>
 export const toggleDrawerOverlayed = () =>
 	({
 		type : 'TOGGLE_DRAWER_OVERLAYED'
+	});
+
+export const toggleDrawerOverlayedOp = () =>
+	({
+		type : 'TOGGLE_DRAWER_OVERLAYED_OP'
 	});
 
 export const toggleShowNotifications = () =>

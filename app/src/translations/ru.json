@@ -179,6 +179,7 @@
 	"settings.autoGainControl": "Автоматическая регулировка усиления",
 	"settings.noiseSuppression": "Подавление шума",
 	"settings.drawerOverlayed": "Боковая панель поверх содержимого",
+	"settings.drawerOverlayedOp": "Боковая панель прозрачная",
 	"settings.voiceActivatedUnmute": "Активирован звук включен",
 	"settings.noiseThreshold": "Порог шума",
 	"settings.aspectRatio":"Соотношение сторон",

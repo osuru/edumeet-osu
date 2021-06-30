@@ -254,11 +254,17 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this.recordVideo = null;
+
+		this.recordSrc = null;
+
 		this._startKeyListener();
 
 		this._startDevicesListener();
 
 		this.setLocale(store.getState().intl.locale);
+
+		this.state={};
 
 	}
 
@@ -1849,7 +1855,45 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('moderator:start_record');
+			// TODO: switch remote and local recording
+			// REMOTE - await this.sendRequest('moderator:start_record');
+			// const elementToRecord = store.getState().me.ref1;
+
+			// const canvas2d = store.getState().me.ref2;
+
+			// logger.error('BBBBBBBBBBBB: %o', store.getState().me);
+
+			/* const context = canvas2d.getContext('2d');
+
+			canvas2d.width = elementToRecord.clientWidth;
+			canvas2d.height = elementToRecord.clientHeight;
+
+			const looper = (() =>
+			{
+				html2canvas(elementToRecord).then(function(canvas)
+				{
+					if (this.recorded)
+					{
+						return setTimeout(looper.bind(this), 500);
+					}
+					context.clearRect(0, 0, canvas2d.width, canvas2d.height);
+					context.drawImage(canvas, 0, 0, canvas2d.width, canvas2d.height);
+
+					if (!this.recorded)
+					{
+						return;
+					}
+
+					requestAnimationFrame(looper);
+				});
+			}, []);
+
+			looper.bind(this);
+			setTimeout(looper.bind(this), 500);
+
+			this.recordVideo = MultiStreamRecorder(canvas2d, { mimeType: 'video/webm' });
+			this.recordVideo.startRecording();
+*/
 		}
 		catch (error)
 		{
@@ -1867,7 +1911,11 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('moderator:stop_record');
+			// await this.sendRequest('moderator:stop_record');
+			/* this.recordVideo.stopRecording(() =>
+			{
+				this.save('file-name.webm');
+			}); */
 		}
 		catch (error)
 		{

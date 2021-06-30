@@ -5,6 +5,7 @@ import {
 	makePermissionSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
+import * as meActions from '../../actions/meActions';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -161,6 +162,12 @@ const Me = (props) =>
 	const intl = useIntl();
 
 	let touchTimeout = null;
+
+	const video2 = React.createRef();
+
+	const video3 = React.createRef();
+
+	// meActions.setRef(video2, video3);
 
 	const {
 		roomClient,

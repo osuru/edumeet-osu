@@ -51,26 +51,34 @@ const styles = (theme) =>
 		persistentDrawerOpen :
 		{
 			width                          : 'calc(100% - 30vw)',
-			marginLeft                     : '30vw',
+			marginRight                    : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width      : 'calc(100% - 40vw)',
-				marginLeft : '40vw'
+				width       : 'calc(100% - 30vw)',
+				marginRight : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width      : 'calc(100% - 50vw)',
-				marginLeft : '50vw'
+				width       : 'calc(100% - 40vw)',
+				marginRight : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width      : 'calc(100% - 70vw)',
-				marginLeft : '70vw'
+				width       : 'calc(100% - 50vw)',
+				marginRight : '50vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width      : 'calc(100% - 90vw)',
-				marginLeft : '90vw'
+				width       : 'calc(100% - 90vw)',
+				marginRight : '90vw'
+			}
+		},
+		opacity :
+		{
+			// opacity   : 0.3,
+			'&:hover' :
+			{
+				opacity : 1
 			}
 		},
 		menuButton :
@@ -93,8 +101,13 @@ const styles = (theme) =>
 		},
 		show :
 		{
-			opacity    : 1,
-			transition : 'opacity .5s'
+			// opacity    : 0.5,
+			transition : 'opacity .5s',
+			'&:hover'  :
+			{
+				// opacity    : 1,
+				transition : 'opacity .5s'
+			}
 		},
 		hide :
 		{
@@ -116,7 +129,7 @@ const styles = (theme) =>
 		},
 		sectionDesktop : {
 			display                      : 'none',
-			[theme.breakpoints.up('md')] : {
+			[theme.breakpoints.up('sm')] : {
 				display : 'flex'
 			}
 		},
@@ -218,6 +231,7 @@ const TopBar = (props) =>
 		lobbyPeers,
 		permanentTopBar,
 		drawerOverlayed,
+		drawerOverlayedOp,
 		toolAreaOpen,
 		isMobile,
 		myPicture,
@@ -300,7 +314,9 @@ const TopBar = (props) =>
 					room.toolbarsVisible || permanentTopBar ?
 						classes.show : classes.hide,
 					!(isMobile || drawerOverlayed) && toolAreaOpen ?
-						classes.persistentDrawerOpen : null
+						classes.persistentDrawerOpen : null,
+					(drawerOverlayedOp) ?
+						classes.opacity : null
 				)}
 			>
 				<Toolbar>
@@ -464,7 +480,7 @@ const TopBar = (props) =>
 							<span className={classes.disabledButton}>
 								<IconButton
 									aria-label={intl.formatMessage({
-										id             : 'tooltip.startRecord',
+										id             : 'tooltip.startRecording',
 										defaultMessage : 'Start recording'
 									})}
 									className={classes.actionButton}
@@ -1035,6 +1051,7 @@ TopBar.propTypes =
 	lobbyPeers           : PropTypes.array,
 	permanentTopBar      : PropTypes.bool.isRequired,
 	drawerOverlayed      : PropTypes.bool.isRequired,
+	drawerOverlayedOp    : PropTypes.bool.isRequired,
 	toolAreaOpen         : PropTypes.bool.isRequired,
 	myPicture            : PropTypes.string,
 	loggedIn             : PropTypes.bool.isRequired,
@@ -1080,17 +1097,18 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 		({
-			room            : state.room,
-			isMobile        : state.me.browser.platform === 'mobile',
-			peersLength     : peersLengthSelector(state),
-			lobbyPeers      : lobbyPeersKeySelector(state),
-			permanentTopBar : state.settings.permanentTopBar,
-			drawerOverlayed : state.settings.drawerOverlayed,
-			toolAreaOpen    : state.toolarea.toolAreaOpen,
-			loggedIn        : state.me.loggedIn,
-			loginEnabled    : state.me.loginEnabled,
-			myPicture       : state.me.picture,
-			unread          : state.toolarea.unreadMessages +
+			room              : state.room,
+			isMobile          : state.me.browser.platform === 'mobile',
+			peersLength       : peersLengthSelector(state),
+			lobbyPeers        : lobbyPeersKeySelector(state),
+			permanentTopBar   : state.settings.permanentTopBar,
+			drawerOverlayed   : state.settings.drawerOverlayed,
+			drawerOverlayedOp : state.settings.drawerOverlayedOp,
+			toolAreaOpen      : state.toolarea.toolAreaOpen,
+			loggedIn          : state.me.loggedIn,
+			loginEnabled      : state.me.loginEnabled,
+			myPicture         : state.me.picture,
+			unread            : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
@@ -1162,6 +1180,7 @@ export default withRoomContext(connect(
 				prev.lobbyPeers === next.lobbyPeers &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
+				prev.settings.drawerOverlayedOp === next.settings.drawerOverlayedOp &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.browser === next.me.browser &&
 				prev.me.loginEnabled === next.me.loginEnabled &&

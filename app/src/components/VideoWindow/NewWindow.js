@@ -75,7 +75,7 @@ class NewWindow extends React.PureComponent
 	{
 		url        : '',
 		name       : 'edumeet',
-		title      : 'edumeet',
+		title      : 'edumeet-osu',
 		features   : { width: '800px', height: '600px' },
 		onBlock    : null,
 		onUnload   : null,
