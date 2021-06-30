@@ -224,19 +224,19 @@ const JoinDialog = ({
 	const [ authType, setAuthType ] = useState(authTypeDefault);
 
 	const [ roomId, setRoomId ] = useState(
-		decodeURIComponent(location.pathname.slice(1)) ||
+		decodeURIComponent(location.pathname.split('/').slice(-1)) ||
 		randomString({ length: 20 }).toLowerCase()
 	);
 
 	useEffect(() =>
 	{
-		window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
+		window.history.replaceState({}, null, `/room/${encodeURIComponent(roomId)}` || '/');
 
 	}, [ roomId ]);
 
 	useEffect(() =>
 	{
-		(location.pathname === '/') && history.push(encodeURIComponent(roomId));
+		(location.pathname === '/') && history.push(`/room/${encodeURIComponent(roomId)}`);
 	});
 
 	const _askForPerms = () =>

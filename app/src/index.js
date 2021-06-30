@@ -174,6 +174,7 @@ function run()
 		});
 
 	global.CLIENT = roomClient;
+	// logger.error('OOOOOOO: %o', roomClient);
 
 	render(
 		<Provider store={store}>
@@ -182,13 +183,13 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<Router basename={basePath}>
+								<Router >
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Switch>
-												<Route exact path='/' component={LoginDialog} />
-												<Route exact path='/login_dialog' component={LoginDialog} />
-												<Route path='/:id' component={App} />
+												<Route exact path='/' component={JoinDialog} />
+												<Route path='/login_dialog/:roomId' component={LoginDialog} />
+												<Route path='/room/:id' component={App} />
 											</Switch>
 										</React.Fragment>
 									</Suspense>

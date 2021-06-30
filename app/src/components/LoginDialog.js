@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
@@ -11,6 +12,11 @@ import CookieConsent from 'react-cookie-consent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
+import Logger from '../Logger';
+import { withRoomContext } from '../RoomContext';
+import { connect } from 'react-redux';
+
+const logger = new Logger('LoginDialog');
 
 const styles = (theme) =>
 	({
@@ -101,10 +107,23 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 const ChooseRoom = ({
-	classes
+	classes,
+	loggedIn,
+	room,
+	displayName,
+	loginEnabled,
+	myPicture
 }) =>
 {
 	const intl = useIntl();
+	const username = (loggedIn)?displayName:'';
+	const roomId = useParams().roomId;
+
+	logger.error('KKKKK: %o', useParams());
+	const [ id, setId ] = useState(
+		roomId ||
+		'guestroom'
+	);
 
 	return (
 		<div className={classes.root}>
@@ -123,7 +142,7 @@ const ChooseRoom = ({
 					<hr />
 
 				</DialogTitle>
-
+				{loggedIn &&
 				<form method='post' action={`https://${window.config.host}/auth/callback`}>
 					<DialogContent>
 
@@ -137,6 +156,7 @@ const ChooseRoom = ({
 							variant='outlined'
 							margin='normal'
 							name='username'
+							value={username}
 							required
 							fullWidth
 						/>
@@ -163,6 +183,13 @@ const ChooseRoom = ({
 							margin='normal'
 							name='roomName'
 							type='text'
+							value={id}
+							onChange={(event) =>
+							{
+								const { value } = event.target;
+
+								setId(value.toLowerCase());
+							}}
 							fullWidth
 						/>
 					</DialogContent>
@@ -197,7 +224,40 @@ const ChooseRoom = ({
 						</Button>
 					</DialogActions>
 				</form>
-
+				}
+				{!loggedIn &&
+				<form method='post' action={`https://${window.config.host}/auth/logout`}>
+					<DialogActions>
+						<Button
+							variant='contained'
+							color='secondary'
+							type='button'
+							onClick={(e) =>
+							{
+								e.preventDefault();
+								window.location.href=`/room/${roomId}`;
+							}}
+						>
+							<FormattedMessage
+								id='label.returnToRoom'
+								defaultMessage='Return to room'
+							/>
+						</Button>
+					</DialogActions>
+					<DialogActions>
+						<Button
+							variant='contained'
+							color='secondary'
+							type='submit'
+						>
+							<FormattedMessage
+								id='label.logout'
+								defaultMessage='Logout'
+							/>
+						</Button>
+					</DialogActions>
+				</form>
+				}
 				{ !isElectron() &&
 					<CookieConsent buttonText={intl.formatMessage({
 						id             : 'room.consentUnderstand',
@@ -217,7 +277,39 @@ const ChooseRoom = ({
 
 ChooseRoom.propTypes =
 {
-	classes : PropTypes.object.isRequired
+	classes      : PropTypes.object.isRequired,
+	loggedIn     : PropTypes.object.isRequired,
+	loginEnabled : PropTypes.object.isRequired,
+	displayName  : PropTypes.object.isRequired,
+	room         : PropTypes.object.isRequired,
+	myPicture    : PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(ChooseRoom);
+const mapStateToProps = (state) =>
+{
+	logger.debug('State AAA: %o', state);
+
+	return {
+		room         : state.room,
+		displayName  : state.settings.displayName,
+		loginEnabled : state.me.loginEnabled,
+		loggedIn     : state.me.loggedIn,
+		myPicture    : state.me.picture
+	};
+};
+
+export default withRoomContext(connect(
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.settings.displayName === next.settings.displayName &&
+				prev.me.loginEnabled === next.me.loginEnabled &&
+				prev.me.loggedIn === next.me.loggedIn &&
+				prev.me.picture === next.me.picture
+			);
+		}
+	})(withStyles(styles)(ChooseRoom)));
