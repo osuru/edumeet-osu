@@ -531,7 +531,7 @@ export default class RoomClient
 
 	login(roomId = this._roomId)
 	{
-		const url = `https://${window.config.host}/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
+		const url = `https://${window.config.host}/auth/login?peerId=${this._peerId}&roomId=${roomId}&callbackurl=${window.location.href}`;
 
 		// window.open(url, 'loginWindow');
 		window.location.href = url;
@@ -540,7 +540,7 @@ export default class RoomClient
 	logout(roomId = this._roomId)
 	{
 		// window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
-		window.location.href = `https://${window.config.host}/auth/logout?peerId=${this._peerId}&roomId=${roomId}`;
+		window.location.href = `https://${window.config.host}/auth/logout?peerId=${this._peerId}&roomId=${roomId}&callbackurl=${window.location.href}`;
 	}
 
 	receiveLoginChildWindow(data)

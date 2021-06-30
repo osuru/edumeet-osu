@@ -226,7 +226,7 @@ const ChooseRoom = ({
 				</form>
 				}
 				{!loggedIn &&
-				<form method='post' action={`https://${window.config.host}/auth/logout`}>
+				<form method='get' action={`https://${window.config.host}/auth/logout`}>
 					<DialogActions>
 						<Button
 							variant='contained'

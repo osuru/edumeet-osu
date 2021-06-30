@@ -183,7 +183,7 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<Router >
+								<Router basename='/'>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Switch>
