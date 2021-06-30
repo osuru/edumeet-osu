@@ -9,10 +9,21 @@ exports.loginHelper = function(data)
 		<body>
 			<script type='text/javascript'>
 				let data = ${JSON.stringify(data)};
-	
-				window.opener.CLIENT.receiveLoginChildWindow(data);
+				try{
+				//if (window.opener && window.opener.CLIENT){
+				    window.opener.CLIENT.receiveLoginChildWindow(data);
+				//}
 	
 				window.close();
+				}
+				catch(err){
+				}
+				finally{
+					if (data.room) {
+					    window.location='/'+room;
+					} else 
+					{ window.location = '/'; }
+				}
 			</script>
 		</body>
 	</html>`;
@@ -30,9 +41,14 @@ exports.logoutHelper = function()
 		</head>
 		<body>
 			<script type='text/javascript'>
+				try{
 				window.opener.CLIENT.receiveLogoutChildWindow();
 
 				window.close();
+				}
+				catch(err){
+				 window.location = '/'; 
+				}
 			</script>
 		</body>
 	</html>`;

@@ -148,16 +148,16 @@ module.exports = class GStreamer {
 	if (video) videoArr = [
 	   `udpsrc address=${ip} port=${video.remoteRtcpPort}`,
       '!',
-      'rtpbin.recv_rtcp_sink_0 rtpbin.send_rtcp_src_0',
-      '!',
+      /*'rtpbin.recv_rtcp_sink_0 rtpbin.send_rtcp_src_0',
+      '!',*/
       `udpsink host=${ip} port=${video.localRtcpPort} bind-address=${ip} bind-port=${video.remoteRtcpPort} sync=false async=true`,
 		];
 
 	if (audio) audioArr = [
       `udpsrc address=${ip} port=${audio.remoteRtcpPort}`,
       '!',
-      'rtpbin.recv_rtcp_sink_1 rtpbin.send_rtcp_src_1',
-      '!',
+      /*'rtpbin.recv_rtcp_sink_1 rtpbin.send_rtcp_src_1',
+      '!',*/
       `udpsink host=${ip} port=${audio.localRtcpPort} bind-address=${ip} bind-port=${audio.remoteRtcpPort} sync=false async=true`
 	];
 	
