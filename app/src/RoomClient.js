@@ -531,14 +531,16 @@ export default class RoomClient
 
 	login(roomId = this._roomId)
 	{
-		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
+		const url = `https://${window.config.host}/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
 
-		window.open(url, 'loginWindow');
+		// window.open(url, 'loginWindow');
+		window.location.href = url;
 	}
 
 	logout(roomId = this._roomId)
 	{
-		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
+		// window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
+		window.location.href = `https://${window.config.host}/auth/logout?peerId=${this._peerId}&roomId=${roomId}`;
 	}
 
 	receiveLoginChildWindow(data)

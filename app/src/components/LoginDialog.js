@@ -124,7 +124,7 @@ const ChooseRoom = ({
 
 				</DialogTitle>
 
-				<form method='post' action='/auth/callback'>
+				<form method='post' action={`https://${window.config.host}/auth/callback`}>
 					<DialogContent>
 
 						<TextField
