@@ -119,7 +119,7 @@ const ChooseRoom = ({
 	const username = (loggedIn)?displayName:'';
 	const roomId = useParams().roomId;
 
-	logger.error('KKKKK: %o', useParams());
+	logger.error('KKKKK: %o %o %o', displayName, loggedIn, room);
 	const [ id, setId ] = useState(
 		roomId ||
 		'guestroom'
@@ -142,7 +142,7 @@ const ChooseRoom = ({
 					<hr />
 
 				</DialogTitle>
-				{loggedIn &&
+				{!loggedIn &&
 				<form method='post' action={`https://${window.config.host}/auth/callback`}>
 					<DialogContent>
 
@@ -225,7 +225,7 @@ const ChooseRoom = ({
 					</DialogActions>
 				</form>
 				}
-				{!loggedIn &&
+				{loggedIn &&
 				<form method='get' action={`https://${window.config.host}/auth/logout`}>
 					<DialogActions>
 						<Button
@@ -278,11 +278,11 @@ const ChooseRoom = ({
 ChooseRoom.propTypes =
 {
 	classes      : PropTypes.object.isRequired,
-	loggedIn     : PropTypes.object.isRequired,
-	loginEnabled : PropTypes.object.isRequired,
-	displayName  : PropTypes.object.isRequired,
+	loggedIn     : PropTypes.bool.isRequired,
+	loginEnabled : PropTypes.bool.isRequired,
+	displayName  : PropTypes.string.isRequired,
 	room         : PropTypes.object.isRequired,
-	myPicture    : PropTypes.object.isRequired
+	myPicture    : PropTypes.string
 };
 
 const mapStateToProps = (state) =>
