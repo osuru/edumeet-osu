@@ -96,16 +96,18 @@ module.exports = class FFmpeg {
       '+genpts',
       '-f',
       'sdp',
-      '-i',
-      'pipe:0','-ss','10'
+	  '-i',
+      'pipe:0'
     ];
-
-    commandArgs = commandArgs.concat(this._videoArgs);
+	if (this._rtpParameters['video'])
+		commandArgs = commandArgs.concat(this._videoArgs);
+	if (this._rtpParameters['audio'])
     commandArgs = commandArgs.concat(this._audioArgs);
-
+    
     commandArgs = commandArgs.concat([
       '-flags',
       '+global_header',
+	  '-analyzeduration','11000000',
       `${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}.webm`
     ]);
 
