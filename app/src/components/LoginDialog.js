@@ -156,7 +156,6 @@ const ChooseRoom = ({
 							variant='outlined'
 							margin='normal'
 							name='username'
-							value={username}
 							required
 							fullWidth
 						/>
