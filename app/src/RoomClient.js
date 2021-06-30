@@ -527,7 +527,8 @@ export default class RoomClient
 	{
 		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
 
-		window.open(url, 'loginWindow');
+		// window.open(url, 'loginWindow');
+		window.location.href = url;
 	}
 
 	logout(roomId = this._roomId)

@@ -550,7 +550,9 @@ async function setupAuth()
 
 				res.send(loginHelper({
 					displayName : peer.displayName,
-					picture     : peer.picture
+					picture     : peer.picture,
+					room        : room
+
 				}));
 			}
 			catch (error)

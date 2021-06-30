@@ -1,4 +1,4 @@
-' EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
@@ -310,7 +310,7 @@ class Room extends EventEmitter
 
 		this._handleLobby();
 		this._handleAudioLevelObserver();
-		this.PROCESS_NAME = process.env.PROCESS_NAME  || config.mediasoup.recording.process_name || 'FFmpeg';
+		this.PROCESS_NAME = process.env.PROCESS_NAME  || config.mediasoup.recording.process_name || 'GStreamer';
 		this.SERVER_PORT = process.env.SERVER_PORT || 3000;
 	}
 
@@ -611,10 +611,10 @@ class Room extends EventEmitter
 	*/
 	getProcess (recordInfo)  
 	{
-	  switch (this.PROCESS_NAME) {
-		case 'GStreamer':
+	  switch (this.PROCESS_NAME.toUpperCase()) {
+		case 'GSTREAMER':
 		  return new GStreamer(recordInfo);
-		case 'FFmpeg':
+		case 'FFMPEG':
 		default:
 		  return new FFmpeg(recordInfo);
 	  }
@@ -632,7 +632,7 @@ class Room extends EventEmitter
 	  const rtpTransportConfig = config.mediasoup.plainRtpTransport;
 
 	  // If the process is set to GStreamer set rtcpMux to false
-	  if (this.PROCESS_NAME === 'GStreamer') {
+	  if (this.PROCESS_NAME.toUpperCase() === 'GSTREAMER') {
 		rtpTransportConfig.rtcpMux = false;
 	  }
 	  
