@@ -41,11 +41,10 @@ const styles = (theme) =>
 		},
 		buttonControlBar :
 		{
-			paddingLeft                    : PADDING_H,
-			[theme.breakpoints.down('sm')] :
-			{
-				paddingLeft : PADDING_H
-			}
+			// [theme.breakpoints.down('sm')] :
+			// {
+			// 	paddingLeft : PADDING_H
+			// }
 		}
 	});
 
