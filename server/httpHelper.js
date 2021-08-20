@@ -47,7 +47,7 @@ exports.logoutHelper = function()
 				window.close();
 				}
 				catch(err){
-				 window.location = '/'; 
+				 window.location='/'+room; 
 				}
 			</script>
 		</body>
