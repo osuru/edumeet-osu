@@ -205,23 +205,23 @@ const ChooseRoom = ({
 							/>
 						</Button>
 					</DialogActions>
-					<DialogActions>
-						<Button
-							variant='contained'
-							color='secondary'
-							type='button'
-							onClick={(e) =>
-							{
-								e.preventDefault();
-								window.location.href='/guestroom';
-							}}
-						>
-							<FormattedMessage
-								id='label.loginAsGuest'
-								defaultMessage='Login as guest'
-							/>
-						</Button>
-					</DialogActions>
+					{/* <DialogActions>*/}
+					{/*	<Button*/}
+					{/*		variant='contained'*/}
+					{/*		color='secondary'*/}
+					{/*		type='button'*/}
+					{/*		onClick={(e) =>*/}
+					{/*		{*/}
+					{/*			e.preventDefault();*/}
+					{/*			window.location.href='/guestroom';*/}
+					{/*		}}*/}
+					{/*	>*/}
+					{/*		<FormattedMessage*/}
+					{/*			id='label.loginAsGuest'*/}
+					{/*			defaultMessage='Login as guest'*/}
+					{/*		/>*/}
+					{/*	</Button>*/}
+					{/* </DialogActions>*/}
 				</form>
 				}
 				{loggedIn &&

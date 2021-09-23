@@ -20,9 +20,14 @@ exports.loginHelper = function(data)
 				}
 				finally{
 					if (data.room) {
-					    window.location='/'+room;
+					    // window.location='/'+room;
+					    setTimeout(function (){
+                            window.location = '/room' + data.room + '?displayName=' + data.displayName + '&loggedIn=1'
+					    }, 1000);
 					} else 
-					{ window.location = '/'; }
+					{ 
+                        window.location = '/room/guestroom';
+                    }
 				}
 			</script>
 		</body>

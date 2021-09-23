@@ -437,6 +437,8 @@ const JoinDialog = ({
 							id             : 'label.yourName',
 							defaultMessage : 'Your name'
 						})}
+						// value={loggedIn ? displayName: changeDisplayName(`Guest ${Math.floor(Math.random()
+						// * (100000 - 10000)) + 10000}`)}
 						value={displayName}
 						variant='outlined'
 						onFocus={handleFocus}
@@ -598,7 +600,7 @@ const JoinDialog = ({
 							} */}
 							{/* /AUTH TOGGLE BUTTONS */}
 							{/* JOIN/AUTH BUTTON */}
-							{ authType !=='auth' &&
+							{ !loggedIn &&
 								<Grid item >
 									<Button
 										onClick={handleJoin}

@@ -3072,7 +3072,7 @@ export default class RoomClient
 
 					case 'moderator:stop_record':
 					{
-						if (this.recorded==true)
+						if (this.recorded===true)
 						{
 							store.dispatch(requestActions.notify(
 								{

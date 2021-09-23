@@ -88,6 +88,7 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+	const loggedIn = parameters.get('loggedIn');
 
 	const { pathname } = window.location;
 
@@ -174,6 +175,7 @@ function run()
 		});
 
 	global.CLIENT = roomClient;
+	roomClient.displayName = displayName;
 	// logger.error('OOOOOOO: %o', roomClient);
 
 	render(

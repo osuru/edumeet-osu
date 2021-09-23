@@ -551,7 +551,9 @@ async function setupAuth()
 				res.send(loginHelper({
 					displayName : peer.displayName,
 					picture     : peer.picture,
-					room        : room
+					callback_url : callback_url,
+					room        : roomId || peer.roomId,
+					test : '123'
 
 				}));
 			}
